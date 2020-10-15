@@ -7,10 +7,21 @@ defmodule FeedMeWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug FeedMeWeb.Plugs.SetUser
   end
 
   pipeline :api do
     plug :accepts, ["json"]
+  end
+
+  scope "/auth", FeedMeWeb do
+    pipe_through :browser
+
+    # this line has to be before the subsequent line or else `:provider` matches `logout`
+    get "/logout", AuthController, :logout
+    # :request is defined via Ueberauth package
+    get "/:provider", AuthController, :request
+    get "/:provider/callback", AuthController, :callback
   end
 
   scope "/", FeedMeWeb do
