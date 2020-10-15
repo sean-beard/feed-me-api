@@ -66,7 +66,7 @@ feed_item
 - id
 - feed_id (FK)
 - title
-- link
+- url
 - description
 - pub_date
 
