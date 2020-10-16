@@ -8,6 +8,7 @@ defmodule FeedMe.Account.User do
     field :provider, :string
     field :token, :string
     has_many :subscriptions, FeedMe.AccountContent.Subscription
+    has_many :feed_item_statuses, FeedMe.AccountContent.FeedItemStatus
 
     timestamps()
   end

@@ -61,4 +61,63 @@ defmodule FeedMe.AccountContentTest do
       assert %Ecto.Changeset{} = AccountContent.change_subscription(subscription)
     end
   end
+
+  describe "feed_item_statuses" do
+    alias FeedMe.AccountContent.FeedItemStatus
+
+    @valid_attrs %{is_read: true}
+    @update_attrs %{is_read: false}
+    @invalid_attrs %{is_read: nil}
+
+    def feed_item_status_fixture(attrs \\ %{}) do
+      {:ok, feed_item_status} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> AccountContent.create_feed_item_status()
+
+      feed_item_status
+    end
+
+    test "list_feed_item_statuses/0 returns all feed_item_statuses" do
+      feed_item_status = feed_item_status_fixture()
+      assert AccountContent.list_feed_item_statuses() == [feed_item_status]
+    end
+
+    test "get_feed_item_status!/1 returns the feed_item_status with given id" do
+      feed_item_status = feed_item_status_fixture()
+      assert AccountContent.get_feed_item_status!(feed_item_status.id) == feed_item_status
+    end
+
+    test "create_feed_item_status/1 with valid data creates a feed_item_status" do
+      assert {:ok, %FeedItemStatus{} = feed_item_status} = AccountContent.create_feed_item_status(@valid_attrs)
+      assert feed_item_status.is_read == true
+    end
+
+    test "create_feed_item_status/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = AccountContent.create_feed_item_status(@invalid_attrs)
+    end
+
+    test "update_feed_item_status/2 with valid data updates the feed_item_status" do
+      feed_item_status = feed_item_status_fixture()
+      assert {:ok, %FeedItemStatus{} = feed_item_status} = AccountContent.update_feed_item_status(feed_item_status, @update_attrs)
+      assert feed_item_status.is_read == false
+    end
+
+    test "update_feed_item_status/2 with invalid data returns error changeset" do
+      feed_item_status = feed_item_status_fixture()
+      assert {:error, %Ecto.Changeset{}} = AccountContent.update_feed_item_status(feed_item_status, @invalid_attrs)
+      assert feed_item_status == AccountContent.get_feed_item_status!(feed_item_status.id)
+    end
+
+    test "delete_feed_item_status/1 deletes the feed_item_status" do
+      feed_item_status = feed_item_status_fixture()
+      assert {:ok, %FeedItemStatus{}} = AccountContent.delete_feed_item_status(feed_item_status)
+      assert_raise Ecto.NoResultsError, fn -> AccountContent.get_feed_item_status!(feed_item_status.id) end
+    end
+
+    test "change_feed_item_status/1 returns a feed_item_status changeset" do
+      feed_item_status = feed_item_status_fixture()
+      assert %Ecto.Changeset{} = AccountContent.change_feed_item_status(feed_item_status)
+    end
+  end
 end
