@@ -7,6 +7,7 @@ defmodule FeedMe.Content.Feed do
     field :name, :string
     field :url, :string
     has_many :feed_items, FeedMe.Content.FeedItem
+    has_many :subscriptions, FeedMe.AccountContent.Subscription
 
     timestamps()
   end

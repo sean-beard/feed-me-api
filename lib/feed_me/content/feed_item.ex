@@ -8,6 +8,7 @@ defmodule FeedMe.Content.FeedItem do
     field :title, :string
     field :url, :string
     belongs_to :feed, FeedMe.Content.Feed
+    has_many :feed_item_statuses, FeedMe.AccountContent.FeedItemStatus
 
     timestamps()
   end
