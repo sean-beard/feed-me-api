@@ -7,6 +7,7 @@ defmodule FeedMe.Account.User do
     field :name, :string
     field :provider, :string
     field :token, :string
+    has_many :subscriptions, FeedMe.AccountContent.Subscription
 
     timestamps()
   end
