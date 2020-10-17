@@ -60,3 +60,39 @@ RSS feed management application.
 - feed_item_id
 - is_read
 - is_flagged
+
+## Development
+
+Make sure to have Elixer, Erlang and NodeJS installed on your machine. This application was developed with:
+
+- Elixir v1.10.4
+- Erlang v23.1
+- NodeJS v12.18.2
+
+### Getting started
+
+Get the frontend dependencies:
+
+```bash
+$ cd assets && npm install && cd ..
+```
+
+Get the backend dependencies:
+
+```bash
+$ mix deps.get
+```
+
+Set up the database:
+
+```bash
+$ mix ecto.migrate
+```
+
+Start the Phoenix server:
+
+```bash
+$ mix phx.server
+```
+
+Navigate to http://localhost:4001 in your web browser.
