@@ -1,4 +1,6 @@
-# Feed Me
+# FeedMe
+
+RSS feed management application.
 
 ## Features
 
@@ -12,56 +14,37 @@
   - Flagged (not MVP)
 - Users can flag items to save for later (not MVP)
 
-## Web app
+## API Endpoints
 
-VueJS 2
-Maybe upgrade to VueJS 3 once ecosystem matures?
+| Route                   | Verb | Description                                  |
+| ----------------------- | ---- | -------------------------------------------- |
+| /feed                   | GET  | Get all sorted feed items from subscriptions |
+| /feed/:feed_id          | GET  | Get feed name and corresponding feed items   |
+| /feed/:feed_id/:item_id | PUT  | Update a feed item's metadata                |
 
-https://materializecss.com/
+| Route                  | Verb | Description                                          |
+| ---------------------- | ---- | ---------------------------------------------------- |
+| /subscription          | GET  | Get all user subscriptions                           |
+| /subscription          | POST | Create a subscription and a feed if it doesn't exist |
+| /subscription/:feed_id | PUT  | Update a subscription                                |
 
-## API
+## Database Tables
 
-Phoenix / Elixir
-
-### Endpoints
-
-#### feed
-
-| Route              | Verb | Description                                  |
-| ------------------ | ---- | -------------------------------------------- |
-| /                  | GET  | Get all sorted feed items from subscriptions |
-| /:feed_id          | GET  | Get feed name and corresponding feed items   |
-| /:feed_id/:item_id | PUT  | Update a feed item's metadata                |
-
-### subscriptions
-
-| Route     | Verb | Description                                          |
-| --------- | ---- | ---------------------------------------------------- |
-| /         | GET  | Get all user subscriptions                           |
-| /         | POST | Create a subscription and a feed if it doesn't exist |
-| /:feed_id | PUT  | Update a subscription                                |
-
-## DB
-
-Postgres
-
-### Tables
-
-feed
+`feeds`
 
 - id
 - name
 - description
 - url
 
-subscription_fact
+`subscriptions`
 
 - id
 - user_id
 - feed_id
 - is_subscribed
 
-feed_item
+`feed_items`
 
 - id
 - feed_id (FK)
@@ -70,7 +53,7 @@ feed_item
 - description
 - pub_date
 
-feed_item_status_fact
+`feed_item_statuses`
 
 - id
 - user_id
