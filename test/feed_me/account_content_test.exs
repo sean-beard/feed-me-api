@@ -30,7 +30,9 @@ defmodule FeedMe.AccountContentTest do
     end
 
     test "create_subscription/1 with valid data creates a subscription" do
-      assert {:ok, %Subscription{} = subscription} = AccountContent.create_subscription(@valid_attrs)
+      assert {:ok, %Subscription{} = subscription} =
+               AccountContent.create_subscription(@valid_attrs)
+
       assert subscription.is_subscribed == true
     end
 
@@ -40,20 +42,29 @@ defmodule FeedMe.AccountContentTest do
 
     test "update_subscription/2 with valid data updates the subscription" do
       subscription = subscription_fixture()
-      assert {:ok, %Subscription{} = subscription} = AccountContent.update_subscription(subscription, @update_attrs)
+
+      assert {:ok, %Subscription{} = subscription} =
+               AccountContent.update_subscription(subscription, @update_attrs)
+
       assert subscription.is_subscribed == false
     end
 
     test "update_subscription/2 with invalid data returns error changeset" do
       subscription = subscription_fixture()
-      assert {:error, %Ecto.Changeset{}} = AccountContent.update_subscription(subscription, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               AccountContent.update_subscription(subscription, @invalid_attrs)
+
       assert subscription == AccountContent.get_subscription!(subscription.id)
     end
 
     test "delete_subscription/1 deletes the subscription" do
       subscription = subscription_fixture()
       assert {:ok, %Subscription{}} = AccountContent.delete_subscription(subscription)
-      assert_raise Ecto.NoResultsError, fn -> AccountContent.get_subscription!(subscription.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        AccountContent.get_subscription!(subscription.id)
+      end
     end
 
     test "change_subscription/1 returns a subscription changeset" do
@@ -89,7 +100,9 @@ defmodule FeedMe.AccountContentTest do
     end
 
     test "create_feed_item_status/1 with valid data creates a feed_item_status" do
-      assert {:ok, %FeedItemStatus{} = feed_item_status} = AccountContent.create_feed_item_status(@valid_attrs)
+      assert {:ok, %FeedItemStatus{} = feed_item_status} =
+               AccountContent.create_feed_item_status(@valid_attrs)
+
       assert feed_item_status.is_read == true
     end
 
@@ -99,20 +112,29 @@ defmodule FeedMe.AccountContentTest do
 
     test "update_feed_item_status/2 with valid data updates the feed_item_status" do
       feed_item_status = feed_item_status_fixture()
-      assert {:ok, %FeedItemStatus{} = feed_item_status} = AccountContent.update_feed_item_status(feed_item_status, @update_attrs)
+
+      assert {:ok, %FeedItemStatus{} = feed_item_status} =
+               AccountContent.update_feed_item_status(feed_item_status, @update_attrs)
+
       assert feed_item_status.is_read == false
     end
 
     test "update_feed_item_status/2 with invalid data returns error changeset" do
       feed_item_status = feed_item_status_fixture()
-      assert {:error, %Ecto.Changeset{}} = AccountContent.update_feed_item_status(feed_item_status, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               AccountContent.update_feed_item_status(feed_item_status, @invalid_attrs)
+
       assert feed_item_status == AccountContent.get_feed_item_status!(feed_item_status.id)
     end
 
     test "delete_feed_item_status/1 deletes the feed_item_status" do
       feed_item_status = feed_item_status_fixture()
       assert {:ok, %FeedItemStatus{}} = AccountContent.delete_feed_item_status(feed_item_status)
-      assert_raise Ecto.NoResultsError, fn -> AccountContent.get_feed_item_status!(feed_item_status.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        AccountContent.get_feed_item_status!(feed_item_status.id)
+      end
     end
 
     test "change_feed_item_status/1 returns a feed_item_status changeset" do
