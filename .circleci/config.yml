@@ -27,6 +27,6 @@ workflows:
       - build-and-test:
           matrix:
             parameters:
-              elixir-version: ["1.10.14"]
+              elixir-version: ["1.10.4"]
 
 
