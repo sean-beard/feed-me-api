@@ -13,7 +13,7 @@ jobs:
     steps:
       - checkout
       - elixir/build
-      - check-format
+      - elixir/check-format
       - run:
           command: mix credo --strict
           name: Static analysis to Elixir source code
