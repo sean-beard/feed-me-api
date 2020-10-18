@@ -5,8 +5,11 @@ orbs:
 
 jobs:
   build-and-test:
+    parameters:
+      elixir-version:
+        type: string
     docker:
-      - image: circleci/elixir:1.10.4
+      - image: circleci/elixir:<< parameters.elixir-version >>
     steps:
       - checkout
       - elixir/build
@@ -21,4 +24,9 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - build-and-test
+      - build-and-test:
+          matrix:
+            parameters:
+              elixir-version: ["1.10.14"]
+
+
