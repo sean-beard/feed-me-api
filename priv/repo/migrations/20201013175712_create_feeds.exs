@@ -9,6 +9,5 @@ defmodule FeedMe.Repo.Migrations.CreateFeeds do
 
       timestamps()
     end
-
   end
 end
