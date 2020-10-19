@@ -86,7 +86,14 @@ $ mix deps.get
 Set up the database:
 
 ```bash
+$ mix ecto.create
 $ mix ecto.migrate
+```
+
+Define the environment variables:
+
+```bash
+$ cp .env.sample .env
 ```
 
 Start the Phoenix server:

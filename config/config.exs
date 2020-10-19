@@ -33,26 +33,31 @@ config :ueberauth, Ueberauth,
 
 defmodule DotEnv do
   def get_env(key) do
-    {_env_key, val} =
-      get_env_vars()
-      |> Enum.find(fn {env_key, _env_val} -> key == env_key end)
+    case File.read("#{File.cwd!()}/.env") do
+      {:ok, env_config} ->
+        get_config_value_from_key(key, env_config)
 
-    val
+      {:error, _reason} ->
+        ""
+    end
   end
 
-  defp get_env_vars() do
-    {_status, content} = File.read("#{File.cwd!()}/.env")
+  defp get_config_value_from_key(key, env_config) do
+    config_line =
+      String.split(env_config, "\n")
+      |> Enum.filter(fn x -> String.contains?(x, "=") end)
+      |> Enum.find("", fn x -> key == String.slice(x, 0, get_index_of(x, "=")) end)
 
-    String.split(content, "\n")
-    |> Enum.filter(fn x -> String.contains?(x, "=") end)
-    |> Enum.map(fn x -> get_key_val_pairs(x) end)
+    if String.contains?(config_line, "=") do
+      String.slice(config_line, get_index_of(config_line, "=") + 1, String.length(config_line))
+    else
+      ""
+    end
   end
 
-  defp get_key_val_pairs(string) do
-    {index_of_equals, _num_chars} = :binary.match(string, "=")
-    key = String.slice(string, 0, index_of_equals)
-    value = String.slice(string, index_of_equals + 1, String.length(string))
-    {key, value}
+  defp get_index_of(string_content, string_to_match) do
+    {index_of_equals, _num_chars} = :binary.match(string_content, string_to_match)
+    index_of_equals
   end
 end
 
