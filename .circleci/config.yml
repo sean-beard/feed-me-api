@@ -10,6 +10,7 @@ jobs:
         type: string
     docker:
       - image: circleci/elixir:<< parameters.elixir-version >>
+      - image: circleci/postgres:12-alpine
     steps:
       - checkout
       - elixir/build
