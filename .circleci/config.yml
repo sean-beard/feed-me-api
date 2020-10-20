@@ -14,9 +14,9 @@ jobs:
       - checkout
       - elixir/build
       - elixir/check-format
-      #- run:
-      #    command: mix credo --strict
-      #    name: Static analysis to Elixir source code
+      - run:
+          command: mix credo --strict
+          name: Static analysis to Elixir source code
       - run:
           command: mix test
           name: Execute tests
@@ -28,5 +28,3 @@ workflows:
           matrix:
             parameters:
               elixir-version: ["1.10.4"]
-
-

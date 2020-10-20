@@ -1,4 +1,8 @@
 defmodule FeedMe.Account.User do
+  @moduledoc """
+  This module describes a `User`.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

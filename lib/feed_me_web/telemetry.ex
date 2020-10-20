@@ -1,4 +1,8 @@
 defmodule FeedMeWeb.Telemetry do
+  @moduledoc """
+  This module is used for telemetry polling.
+  """
+
   use Supervisor
   import Telemetry.Metrics
 

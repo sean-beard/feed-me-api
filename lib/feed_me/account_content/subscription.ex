@@ -1,4 +1,7 @@
 defmodule FeedMe.AccountContent.Subscription do
+  @moduledoc """
+  This module describes a `Subscription`.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
