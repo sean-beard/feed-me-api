@@ -1,4 +1,8 @@
 defmodule FeedMe.AccountContent.FeedItemStatus do
+  @moduledoc """
+  This module describes a `FeedItemStatus`. This keeps track of whether or not a feed item has been read.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

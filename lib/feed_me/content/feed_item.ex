@@ -1,4 +1,8 @@
 defmodule FeedMe.Content.FeedItem do
+  @moduledoc """
+  This module describes a `FeedItem`.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

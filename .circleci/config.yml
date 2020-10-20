@@ -10,16 +10,15 @@ jobs:
         type: string
     docker:
       - image: circleci/elixir:<< parameters.elixir-version >>
+      - image: circleci/postgres:12-alpine
     steps:
       - checkout
       - elixir/build
       - elixir/check-format
-      #- run:
-      #    command: mix credo --strict
-      #    name: Static analysis to Elixir source code
       - run:
-          command: mix test
-          name: Execute tests
+          command: mix credo --strict
+          name: Static analysis to Elixir source code
+      - elixir/test
 
 workflows:
   build-and-test:
@@ -28,5 +27,3 @@ workflows:
           matrix:
             parameters:
               elixir-version: ["1.10.4"]
-
-
