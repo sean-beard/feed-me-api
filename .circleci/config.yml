@@ -18,9 +18,7 @@ jobs:
       - run:
           command: mix credo --strict
           name: Static analysis to Elixir source code
-      - run:
-          command: mix test
-          name: Execute tests
+      - elixir/test
 
 workflows:
   build-and-test:
