@@ -28,6 +28,7 @@ defmodule FeedMeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/subscription", SubscriptionController, :index
   end
 
   # Other scopes may use custom stacks.
