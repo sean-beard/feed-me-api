@@ -36,6 +36,7 @@ defmodule FeedMe.Content do
 
   """
   def get_feed!(id), do: Repo.get!(Feed, id)
+  def get_feed_by_url!(url), do: Repo.get_by!(Feed, url: url)
 
   @doc """
   Creates a feed.
