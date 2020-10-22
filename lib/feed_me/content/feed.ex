@@ -21,5 +21,6 @@ defmodule FeedMe.Content.Feed do
     feed
     |> cast(attrs, [:name, :description, :url])
     |> validate_required([:name, :description, :url])
+    |> unique_constraint(:email, name: :feeds_url_index)
   end
 end
