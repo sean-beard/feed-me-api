@@ -69,6 +69,8 @@ Make sure to have Elixer, Erlang and NodeJS installed on your machine. This appl
 - Erlang v23.1
 - NodeJS v12.18.2
 
+You can run `mix docs` to generate the documentation for this project.
+
 ### Getting started
 
 Get the frontend dependencies:

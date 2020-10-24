@@ -10,7 +10,11 @@ defmodule FeedMe.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      # ex_doc config
+      name: "FeedMe",
+      source_url: "https://github.com/sean-beard/feed-me",
+      homepage_url: "https://github.com/sean-beard/feed-me/blob/master/README.md"
     ]
   end
 
@@ -48,7 +52,8 @@ defmodule FeedMe.MixProject do
       {:ueberauth_github, "~> 0.7"},
 
       # Development/Test
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.23", only: :dev, runtime: false}
     ]
   end
 
