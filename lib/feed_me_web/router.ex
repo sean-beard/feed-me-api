@@ -5,7 +5,8 @@ defmodule FeedMeWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
-    plug :protect_from_forgery
+    # TODO: don't do this
+    # plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug FeedMeWeb.Plugs.SetUser
   end
@@ -28,6 +29,8 @@ defmodule FeedMeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/subscription", SubscriptionController, :index
+    post "/subscription", SubscriptionController, :create
   end
 
   # Other scopes may use custom stacks.

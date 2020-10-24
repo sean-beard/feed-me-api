@@ -49,9 +49,12 @@ defmodule FeedMe.AccountContent do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_subscription(attrs \\ %{}) do
-    %Subscription{}
-    |> Subscription.changeset(attrs)
+  def create_subscription(user, feed) do
+    feed
+    |> Ecto.build_assoc(:subscriptions)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Subscription.changeset(%{is_subscribed: true})
     |> Repo.insert()
   end
 

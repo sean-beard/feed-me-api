@@ -1,5 +1,6 @@
 defmodule FeedMe.AccountContentTest do
   use FeedMe.DataCase
+  use FeedMe.Fixtures, [:user, :feed]
 
   alias FeedMe.AccountContent
 
@@ -10,34 +11,35 @@ defmodule FeedMe.AccountContentTest do
     @update_attrs %{is_subscribed: false}
     @invalid_attrs %{is_subscribed: nil}
 
-    def subscription_fixture(attrs \\ %{}) do
-      {:ok, subscription} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> AccountContent.create_subscription()
+    def subscription_fixture do
+      user = user_fixture()
+      feed = feed_fixture()
+
+      {:ok, subscription} = AccountContent.create_subscription(user, feed)
 
       subscription
     end
 
     test "list_subscriptions/0 returns all subscriptions" do
       subscription = subscription_fixture()
-      assert AccountContent.list_subscriptions() == [subscription]
+      assert AccountContent.list_subscriptions() |> Repo.preload(:user) == [subscription]
     end
 
     test "get_subscription!/1 returns the subscription with given id" do
       subscription = subscription_fixture()
-      assert AccountContent.get_subscription!(subscription.id) == subscription
+
+      assert AccountContent.get_subscription!(subscription.id) |> Repo.preload(:user) ==
+               subscription
     end
 
-    test "create_subscription/1 with valid data creates a subscription" do
+    test "create_subscription/2 with valid data creates a subscription" do
+      user = user_fixture()
+      feed = feed_fixture()
+
       assert {:ok, %Subscription{} = subscription} =
-               AccountContent.create_subscription(@valid_attrs)
+               AccountContent.create_subscription(user, feed)
 
       assert subscription.is_subscribed == true
-    end
-
-    test "create_subscription/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = AccountContent.create_subscription(@invalid_attrs)
     end
 
     test "update_subscription/2 with valid data updates the subscription" do
@@ -55,7 +57,8 @@ defmodule FeedMe.AccountContentTest do
       assert {:error, %Ecto.Changeset{}} =
                AccountContent.update_subscription(subscription, @invalid_attrs)
 
-      assert subscription == AccountContent.get_subscription!(subscription.id)
+      assert subscription ==
+               AccountContent.get_subscription!(subscription.id) |> Repo.preload(:user)
     end
 
     test "delete_subscription/1 deletes the subscription" do
