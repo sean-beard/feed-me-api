@@ -4,6 +4,8 @@ defmodule FeedMe.AccountTest do
   alias FeedMe.Account
 
   describe "users" do
+    use FeedMe.Fixtures, [:user]
+
     alias FeedMe.Account.User
 
     @valid_attrs %{
@@ -19,15 +21,6 @@ defmodule FeedMe.AccountTest do
       token: "some updated token"
     }
     @invalid_attrs %{email: nil, name: nil, provider: nil, token: nil}
-
-    def user_fixture(attrs \\ %{}) do
-      {:ok, user} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Account.create_user()
-
-      user
-    end
 
     test "list_users/0 returns all users" do
       user = user_fixture()

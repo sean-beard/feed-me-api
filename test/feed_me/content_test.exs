@@ -1,5 +1,6 @@
 defmodule FeedMe.ContentTest do
   use FeedMe.DataCase
+  use FeedMe.Fixtures, [:feed]
 
   alias FeedMe.Content
 
@@ -13,15 +14,6 @@ defmodule FeedMe.ContentTest do
       url: "some updated url"
     }
     @invalid_attrs %{description: nil, name: nil, url: nil}
-
-    def feed_fixture(attrs \\ %{}) do
-      {:ok, feed} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Content.create_feed()
-
-      feed
-    end
 
     test "list_feeds/0 returns all feeds" do
       feed = feed_fixture()
