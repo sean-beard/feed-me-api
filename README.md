@@ -16,7 +16,7 @@ RSS feed management application.
 
 ## Development
 
-Make sure to have Elixer, Erlang and NodeJS installed on your machine. This application was developed with:
+Make sure to have Elixir, Erlang and NodeJS installed on your machine. This application was developed with:
 
 - Elixir v1.10.4
 - Erlang v23.1
@@ -26,32 +26,32 @@ You can run `mix docs` to generate the documentation for this project.
 
 ### Getting started
 
-Get the frontend dependencies:
+Get the frontend dependencies
 
 ```bash
 $ cd assets && npm install && cd ..
 ```
 
-Get the backend dependencies:
+Get the backend dependencies
 
 ```bash
 $ mix deps.get
 ```
 
-Set up the database:
+Set up the database
 
 ```bash
 $ mix ecto.create
 $ mix ecto.migrate
 ```
 
-Define the environment variables:
+Define the environment variables
 
 ```bash
 $ cp .env.sample .env
 ```
 
-Start the Phoenix server:
+Start the Phoenix server
 
 ```bash
 $ mix phx.server
