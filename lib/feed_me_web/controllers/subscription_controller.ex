@@ -18,9 +18,8 @@ defmodule FeedMeWeb.SubscriptionController do
       {:ok, feed} ->
         create_subscription(conn, feed)
 
-      {:error, _feed_changeset} ->
-        # TODO: check for unique constraint error properly
-        IO.puts("Error creating new feed - probably already exists")
+      {:error, feed_changeset} ->
+        log_create_feed_error(feed_changeset.errors)
         %{"url" => url} = feed
         create_subscription(conn, Content.get_feed_by_url!(url))
     end
@@ -31,8 +30,27 @@ defmodule FeedMeWeb.SubscriptionController do
       {:ok, subscription} ->
         Conn.send_resp(conn, :ok, Jason.encode!(subscription))
 
-      {:error, _subscription_changeset} ->
+      {:error, subscription_changeset} ->
+        log_create_subscription_error(subscription_changeset.errors)
         Conn.send_resp(conn, :internal_server_error, "Error creating subscription")
+    end
+  end
+
+  defp log_create_feed_error(errors) do
+    [email: {_message, [constraint: constraint_type, constraint_name: _name]}] = errors
+    log_create_error(constraint_type, "feed")
+  end
+
+  defp log_create_subscription_error(errors) do
+    [user_id: {_message, [constraint: constraint_type, constraint_name: _name]}] = errors
+    log_create_error(constraint_type, "subscription")
+  end
+
+  defp log_create_error(constraint_type, name) do
+    if constraint_type == :unique do
+      IO.puts("Error creating new #{name}: #{name} already exists.")
+    else
+      IO.puts("Error creating new #{name}.")
     end
   end
 end
