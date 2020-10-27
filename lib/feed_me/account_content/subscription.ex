@@ -20,5 +20,6 @@ defmodule FeedMe.AccountContent.Subscription do
     subscription
     |> cast(attrs, [:is_subscribed])
     |> validate_required([:is_subscribed])
+    |> unique_constraint([:user_id, :feed_id], name: :subscriptions_fk_index)
   end
 end
