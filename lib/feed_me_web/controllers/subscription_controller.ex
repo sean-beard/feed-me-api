@@ -13,14 +13,15 @@ defmodule FeedMeWeb.SubscriptionController do
     Conn.send_resp(conn, :ok, Jason.encode!(subscriptions))
   end
 
-  def create(conn, feed) do
+  def create(conn, %{"url" => url}) do
+    feed = Content.get_feed_from_rss_url(url)
+
     case Content.create_feed(feed) do
       {:ok, feed} ->
         create_subscription(conn, feed)
 
       {:error, feed_changeset} ->
         log_create_feed_error(feed_changeset.errors)
-        %{"url" => url} = feed
         create_subscription(conn, Content.get_feed_by_url!(url))
     end
   end

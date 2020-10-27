@@ -11,9 +11,7 @@
     <script>
       (() => {
         const payload = {
-          name: 'Frontend Focus',
           url: 'https://cprss.s3.amazonaws.com/frontendfoc.us.xml',
-          description: 'A once–weekly roundup of the best front-end news, articles and tutorials. HTML, CSS, WebGL, Canvas, browser tech, and more.'
         }
 
         fetch("/subscription", {

@@ -4,9 +4,9 @@ defmodule FeedMe.Content do
   """
 
   import Ecto.Query, warn: false
-  alias FeedMe.Repo
-
   alias FeedMe.Content.Feed
+  alias FeedMe.Repo
+  alias HTTPoison.Response
 
   @doc """
   Returns the list of feeds.
@@ -197,5 +197,28 @@ defmodule FeedMe.Content do
   """
   def change_feed_item(%FeedItem{} = feed_item, attrs \\ %{}) do
     FeedItem.changeset(feed_item, attrs)
+  end
+
+  def get_feed_from_rss_url(url) do
+    %Response{body: body} = HTTPoison.get!(url)
+
+    %{
+      "rss" => %{
+        "#content" => %{
+          "channel" => %{
+            "description" => description,
+            # "item" => items,
+            # "link" => link,
+            "title" => name
+          }
+        }
+      }
+    } = XmlToMap.naive_map(body)
+
+    %{
+      name: name,
+      url: url,
+      description: description
+    }
   end
 end

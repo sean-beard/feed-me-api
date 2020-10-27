@@ -50,6 +50,8 @@ defmodule FeedMe.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:ueberauth_github, "~> 0.7"},
+      {:httpoison, "~> 1.7"},
+      {:elixir_xml_to_map, "~> 2.0"},
 
       # Development/Test
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
