@@ -13,7 +13,7 @@ defmodule FeedMeWeb.SubscriptionController do
     Conn.send_resp(conn, :ok, Jason.encode!(subscriptions))
   end
 
-  def create(conn, %{"feed" => feed}) do
+  def create(conn, feed) do
     case Content.create_feed(feed) do
       {:ok, feed} ->
         create_subscription(conn, feed)
