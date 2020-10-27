@@ -13,3 +13,9 @@ import "../css/app.scss";
 //     import socket from "./socket"
 //
 import "phoenix_html";
+import Vue from "vue";
+import Home from "./components/Home.vue";
+
+new Vue({
+  render: (h) => h(Home),
+}).$mount("#app");
