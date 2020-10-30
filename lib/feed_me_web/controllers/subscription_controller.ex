@@ -6,7 +6,7 @@ defmodule FeedMeWeb.SubscriptionController do
   alias Plug.Conn
 
   # This plug will execute before every handler in this list
-  plug FeedMeWeb.Plugs.RequireAuth
+  plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
   def index(conn, _params) do
     subscriptions = AccountContent.list_subscriptions()

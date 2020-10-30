@@ -52,6 +52,7 @@ defmodule FeedMe.MixProject do
       {:ueberauth_github, "~> 0.7"},
       {:httpoison, "~> 1.7"},
       {:elixir_xml_to_map, "~> 2.0"},
+      {:cors_plug, "~> 1.5"},
 
       # Development/Test
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
