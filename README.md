@@ -26,13 +26,7 @@ You can run `mix docs` to generate the documentation for this project.
 
 ### Getting started
 
-Get the frontend dependencies
-
-```bash
-$ cd assets && npm install && cd ..
-```
-
-Get the backend dependencies
+Get the dependencies
 
 ```bash
 $ mix deps.get

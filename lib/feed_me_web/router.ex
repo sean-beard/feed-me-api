@@ -7,7 +7,7 @@ defmodule FeedMeWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug FeedMeWeb.Plugs.SetUser
+    plug CORSPlug, origin: "*"
   end
 
   pipeline :api do
@@ -30,6 +30,7 @@ defmodule FeedMeWeb.Router do
     get "/", PageController, :index
     get "/subscription", SubscriptionController, :index
     post "/subscription", SubscriptionController, :create
+    options "/subscription", SubscriptionController, :nothing
   end
 
   # Other scopes may use custom stacks.

@@ -25,21 +25,25 @@ defmodule FeedMeWeb.AuthController do
   def logout(conn, _params) do
     conn
     |> configure_session(drop: true)
-    |> redirect(to: "/")
+    |> send_resp(:ok, Jason.encode!(%{status: 200, message: "Successfully signed out."}))
   end
 
   defp sign_in(conn, changeset) do
     case insert_or_update_user(changeset) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "Welcome back!")
         |> put_session(:user_id, user.id)
-        |> redirect(to: "/")
+        |> send_resp(
+          :ok,
+          Jason.encode!(%{status: 200, message: "Successfully signed in.", token: user.token})
+        )
 
       {:error, _reason} ->
         conn
-        |> put_flash(:error, "Error signing in")
-        |> redirect(to: "/")
+        |> send_resp(
+          :internal_server_error,
+          Jason.encode!(%{status: 200, message: "Error signing in."})
+        )
     end
   end
 

@@ -50,6 +50,9 @@ defmodule FeedMe.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:ueberauth_github, "~> 0.7"},
+      {:httpoison, "~> 1.7"},
+      {:elixir_xml_to_map, "~> 2.0"},
+      {:cors_plug, "~> 1.5"},
 
       # Development/Test
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
@@ -65,7 +68,7 @@ defmodule FeedMe.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
+      setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
