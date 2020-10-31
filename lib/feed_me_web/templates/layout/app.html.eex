@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <%= csrf_meta_tag() %>
+    <title>FeedMe · API</title>
+  </head>
+  <body>
+    <header>
+      For more information about this API, see <a href="https://github.com/sean-beard/feed-me-api">the official GitHub repository.</a>
+    </header>
+  </body>
+</html>
