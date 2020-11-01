@@ -31,6 +31,9 @@ defmodule FeedMeWeb.Router do
     get "/subscription", SubscriptionController, :index
     post "/subscription", SubscriptionController, :create
     options "/subscription", SubscriptionController, :nothing
+
+    get "/feed", FeedController, :index
+    options "/feed", FeedController, :nothing
   end
 
   # Other scopes may use custom stacks.

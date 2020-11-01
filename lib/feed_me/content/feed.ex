@@ -6,6 +6,8 @@ defmodule FeedMe.Content.Feed do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :name, :description, :url, :items]}
+
   schema "feeds" do
     field :description, :string
     field :name, :string

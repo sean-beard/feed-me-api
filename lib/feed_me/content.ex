@@ -221,4 +221,20 @@ defmodule FeedMe.Content do
       description: description
     }
   end
+
+  def get_feed_items_from_rss_url(url) do
+    %Response{body: body} = HTTPoison.get!(url)
+
+    %{
+      "rss" => %{
+        "#content" => %{
+          "channel" => %{
+            "item" => items
+          }
+        }
+      }
+    } = XmlToMap.naive_map(body)
+
+    items
+  end
 end
