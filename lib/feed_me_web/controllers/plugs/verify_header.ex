@@ -18,11 +18,19 @@ defmodule FeedMeWeb.Plugs.VerifyHeader do
       if user != nil do
         conn
       else
-        send_resp(conn, :unauthorized, "Oops! You must be logged in to do that.")
+        send_resp(
+          conn,
+          :unauthorized,
+          Jason.encode!(%{status: 401, message: "Oops! You must be logged in to do that."})
+        )
         |> halt()
       end
     else
-      send_resp(conn, :unauthorized, "Oops! You must be logged in to do that.")
+      send_resp(
+        conn,
+        :unauthorized,
+        Jason.encode!(%{status: 401, message: "Oops! No Authorization header was sent."})
+      )
       |> halt()
     end
   end
