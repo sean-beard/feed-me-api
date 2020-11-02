@@ -21,5 +21,6 @@ defmodule FeedMe.Content.FeedItem do
     |> cast(attrs, [:title, :description, :url, :pub_date])
     |> validate_required([:title, :description, :url, :pub_date])
     |> foreign_key_constraint(:feed_id)
+    |> unique_constraint([:url, :feed_id], name: :feed_items_index)
   end
 end
