@@ -8,13 +8,12 @@ defmodule FeedMeWeb.FeedController do
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
   def index(conn, _params) do
-    feeds =
-      Content.list_feeds()
-      |> Enum.map(fn feed ->
-        items = Content.get_feed_items_from_rss_url(feed.url)
-        Map.put(feed, :items, items)
-      end)
-
+    feeds = Content.list_feeds()
     Conn.send_resp(conn, :ok, Jason.encode!(feeds))
+  end
+
+  def get_item(conn, %{"id" => id}) do
+    item = Content.get_feed_item!(id)
+    Conn.send_resp(conn, :ok, Jason.encode!(item))
   end
 end

@@ -5,6 +5,7 @@ defmodule FeedMe.Content do
 
   import Ecto.Query, warn: false
   alias FeedMe.Content.Feed
+  alias FeedMe.Content.FeedItem
   alias FeedMe.Repo
   alias HTTPoison.Response
 
@@ -18,7 +19,13 @@ defmodule FeedMe.Content do
 
   """
   def list_feeds do
+    # TODO: only get feeds for current user
     Repo.all(Feed)
+    |> Enum.map(fn feed ->
+      insert_all_feed_items(feed)
+      items = list_feed_items(feed.id)
+      Map.put(feed, :items, items)
+    end)
   end
 
   @doc """
@@ -105,17 +112,11 @@ defmodule FeedMe.Content do
 
   alias FeedMe.Content.FeedItem
 
-  @doc """
-  Returns the list of feed_items.
-
-  ## Examples
-
-      iex> list_feed_items()
-      [%FeedItem{}, ...]
-
-  """
-  def list_feed_items do
-    Repo.all(FeedItem)
+  def list_feed_items(feed_id) do
+    FeedItem
+    |> where(feed_id: ^feed_id)
+    |> Repo.all()
+    |> Enum.map(fn item -> convert_db_item_to_json_item(item) end)
   end
 
   @doc """
@@ -132,7 +133,7 @@ defmodule FeedMe.Content do
       ** (Ecto.NoResultsError)
 
   """
-  def get_feed_item!(id), do: Repo.get!(FeedItem, id)
+  def get_feed_item!(id), do: Repo.get!(FeedItem, id) |> convert_db_item_to_json_item
 
   @doc """
   Creates a feed_item.
@@ -149,7 +150,7 @@ defmodule FeedMe.Content do
   def create_feed_item(attrs \\ %{}) do
     %FeedItem{}
     |> FeedItem.changeset(attrs)
-    |> Repo.insert()
+    |> Repo.insert(on_conflict: :nothing)
   end
 
   @doc """
@@ -222,7 +223,15 @@ defmodule FeedMe.Content do
     }
   end
 
-  def get_feed_items_from_rss_url(url) do
+  defp insert_all_feed_items(feed) do
+    db_feed_items =
+      get_feed_items_from_rss_url(feed.url)
+      |> convert_rss_items_to_db_items(feed.id)
+
+    Repo.insert_all(FeedItem, db_feed_items, on_conflict: :nothing)
+  end
+
+  defp get_feed_items_from_rss_url(url) do
     %Response{body: body} = HTTPoison.get!(url)
 
     %{
@@ -236,5 +245,21 @@ defmodule FeedMe.Content do
     } = XmlToMap.naive_map(body)
 
     items
+  end
+
+  defp convert_db_item_to_json_item(item) do
+    Map.put(item, :description, :erlang.binary_to_term(item.description))
+  end
+
+  defp convert_rss_items_to_db_items(items, feed_id) do
+    Enum.map(items, fn %{"title" => title, "description" => description, "link" => url} ->
+      # TODO: convert `item.pubDate` into Date format
+      %{
+        title: title,
+        description: :erlang.term_to_binary(description, [:compressed]),
+        url: url,
+        feed_id: feed_id
+      }
+    end)
   end
 end

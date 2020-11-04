@@ -21,6 +21,7 @@ Make sure to have Elixir, Erlang and NodeJS installed on your machine. This appl
 - Elixir v1.10.4
 - Erlang v23.1
 - NodeJS v12.18.2
+- Postgres v12.2 (needs to be v9.5 or higher)
 
 You can run `mix docs` to generate the documentation for this project.
 
