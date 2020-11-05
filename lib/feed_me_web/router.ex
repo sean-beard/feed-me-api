@@ -33,7 +33,9 @@ defmodule FeedMeWeb.Router do
     options "/subscription", SubscriptionController, :nothing
 
     get "/feed", FeedController, :index
+    get "/item/:id", FeedController, :get_item
     options "/feed", FeedController, :nothing
+    options "/item/:id", FeedController, :nothing
   end
 
   # Other scopes may use custom stacks.

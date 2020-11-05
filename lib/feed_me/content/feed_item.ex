@@ -6,6 +6,8 @@ defmodule FeedMe.Content.FeedItem do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :title, :description, :url, :pub_date]}
+
   schema "feed_items" do
     field :description, :string
     field :pub_date, :date
@@ -13,15 +15,14 @@ defmodule FeedMe.Content.FeedItem do
     field :url, :string
     belongs_to :feed, FeedMe.Content.Feed
     has_many :feed_item_statuses, FeedMe.AccountContent.FeedItemStatus
-
-    timestamps()
   end
 
   @doc false
   def changeset(feed_item, attrs) do
     feed_item
     |> cast(attrs, [:title, :description, :url, :pub_date])
-    |> validate_required([:title, :description, :url, :pub_date])
+    |> validate_required([:title, :description, :url])
     |> foreign_key_constraint(:feed_id)
+    |> unique_constraint([:url, :feed_id], name: :feed_items_index)
   end
 end
