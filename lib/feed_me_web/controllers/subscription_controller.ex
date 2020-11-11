@@ -28,8 +28,12 @@ defmodule FeedMeWeb.SubscriptionController do
 
   defp create_subscription(conn, feed) do
     case AccountContent.create_subscription(conn.assigns.user, feed) do
-      {:ok, subscription} ->
-        Conn.send_resp(conn, :ok, Jason.encode!(subscription))
+      {:ok, _subscription} ->
+        Conn.send_resp(
+          conn,
+          :ok,
+          Jason.encode!(%{status: 200, message: "Successfully subscribed!"})
+        )
 
       {:error, subscription_changeset} ->
         constraint_type = get_subscription_constraint_type(subscription_changeset.errors)
