@@ -28,12 +28,23 @@ defmodule FeedMeWeb.SubscriptionController do
 
   defp create_subscription(conn, feed) do
     case AccountContent.create_subscription(conn.assigns.user, feed) do
-      {:ok, subscription} ->
-        Conn.send_resp(conn, :ok, Jason.encode!(subscription))
+      {:ok, _subscription} ->
+        Conn.send_resp(
+          conn,
+          :ok,
+          Jason.encode!(%{status: 200, message: "Successfully subscribed!"})
+        )
 
       {:error, subscription_changeset} ->
-        log_create_subscription_error(subscription_changeset.errors)
-        Conn.send_resp(conn, :internal_server_error, "Error creating subscription")
+        constraint_type = get_subscription_constraint_type(subscription_changeset.errors)
+
+        if constraint_type == :unique do
+          IO.puts("Subscription already exists.")
+          Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, message: "Already subscribed"}))
+        else
+          log_create_error(nil, "subscription")
+          Conn.send_resp(conn, :internal_server_error, "Error creating subscription")
+        end
     end
   end
 
@@ -42,9 +53,9 @@ defmodule FeedMeWeb.SubscriptionController do
     log_create_error(constraint_type, "feed")
   end
 
-  defp log_create_subscription_error(errors) do
+  defp get_subscription_constraint_type(errors) do
     [user_id: {_message, [constraint: constraint_type, constraint_name: _name]}] = errors
-    log_create_error(constraint_type, "subscription")
+    constraint_type
   end
 
   defp log_create_error(constraint_type, name) do
