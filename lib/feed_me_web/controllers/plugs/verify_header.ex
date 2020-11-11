@@ -15,7 +15,7 @@ defmodule FeedMeWeb.Plugs.VerifyHeader do
         user = FeedMe.Account.get_user_by_token(token)
 
         if user != nil do
-          conn
+          assign(conn, :user, user)
         else
           send_resp(
             conn,
