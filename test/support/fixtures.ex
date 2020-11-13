@@ -48,6 +48,28 @@ defmodule FeedMe.Fixtures do
     end
   end
 
+  def feed_item do
+    alias FeedMe.Content
+
+    quote do
+      @valid_attrs %{
+        title: "Mock Feed Item",
+        description: "Mock feed item description",
+        url: "https://mockfeeditem.com",
+        pub_date: "Wed, 28 Oct 2020 00:00:00 +0000"
+      }
+
+      def feed_item_fixture(attrs \\ %{}) do
+        {:ok, user} =
+          attrs
+          |> Enum.into(@valid_attrs)
+          |> Content.create_feed_item()
+
+        user
+      end
+    end
+  end
+
   @doc """
   Apply the `fixtures`.
   """
