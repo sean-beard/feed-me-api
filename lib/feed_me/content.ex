@@ -278,6 +278,8 @@ defmodule FeedMe.Content do
     item
     |> Map.drop([:feed_item_statuses])
     |> Map.put(:isRead, is_read)
+    |> Map.put(:pubDate, item.pub_date)
+    |> Map.drop([:pub_date])
     |> Map.put(:description, :erlang.binary_to_term(item.description))
   end
 
