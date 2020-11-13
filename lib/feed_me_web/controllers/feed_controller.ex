@@ -9,13 +9,31 @@ defmodule FeedMeWeb.FeedController do
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
   def index(conn, _params) do
-    feeds = Content.list_feeds()
+    feeds = Content.list_feeds(conn.assigns.user.id)
     Conn.send_resp(conn, :ok, Jason.encode!(feeds))
   end
 
-  def get_item(conn, %{"id" => id}) do
-    item = Content.get_feed_item!(id)
-    Conn.send_resp(conn, :ok, Jason.encode!(item))
+  def get_item(conn, %{"id" => feed_item_id}) do
+    item = Content.get_feed_item!(feed_item_id, conn.assigns.user.id)
+
+    case item.isRead do
+      nil ->
+        case AccountContent.create_feed_item_status(item, conn.assigns.user, false) do
+          {:ok, status} ->
+            encoded_item =
+              Map.put(item, :isRead, status.is_read)
+              |> Jason.encode!()
+
+            Conn.send_resp(conn, :ok, encoded_item)
+
+          {:error, _changeset} ->
+            IO.puts("Error creating feed item status for ID #{feed_item_id}")
+            Conn.send_resp(conn, :internal_server_error, "Error getting feed item status")
+        end
+
+      _is_read ->
+        Conn.send_resp(conn, :ok, Jason.encode!(item))
+    end
   end
 
   def update_item_status(conn, %{"id" => feed_item_id, "isRead" => is_read}) do
@@ -38,8 +56,12 @@ defmodule FeedMeWeb.FeedController do
     IO.puts("Updating feed item status...")
 
     case AccountContent.update_feed_item_status(status, %{is_read: is_read}) do
-      {:ok, _status} ->
-        Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, message: "Success"}))
+      {:ok, status} ->
+        Conn.send_resp(
+          conn,
+          :ok,
+          Jason.encode!(%{status: 200, message: "Success", isRead: status.is_read})
+        )
 
       {:error, _changeset} ->
         IO.puts("Error updating feed item status for ID #{feed_item_id}")
@@ -49,11 +71,15 @@ defmodule FeedMeWeb.FeedController do
 
   defp create_feed_item_status(conn, feed_item_id, is_read) do
     IO.puts("Creating new feed item status...")
-    item = Content.get_feed_item!(feed_item_id)
+    item = Content.get_feed_item!(feed_item_id, conn.assigns.user.id)
 
     case AccountContent.create_feed_item_status(item, conn.assigns.user, is_read) do
-      {:ok, _status} ->
-        Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, message: "Success"}))
+      {:ok, status} ->
+        Conn.send_resp(
+          conn,
+          :ok,
+          Jason.encode!(%{status: 200, message: "Success", isRead: status.is_read})
+        )
 
       {:error, _changeset} ->
         IO.puts("Error creating feed item status for ID #{feed_item_id}")

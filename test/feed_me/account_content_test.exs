@@ -11,8 +11,7 @@ defmodule FeedMe.AccountContentTest do
     @update_attrs %{is_subscribed: false}
     @invalid_attrs %{is_subscribed: nil}
 
-    def subscription_fixture do
-      user = user_fixture()
+    def subscription_fixture(user \\ user_fixture()) do
       feed = feed_fixture()
 
       {:ok, subscription} = AccountContent.create_subscription(user, feed)
@@ -20,9 +19,11 @@ defmodule FeedMe.AccountContentTest do
       subscription
     end
 
-    test "list_subscriptions/0 returns all subscriptions" do
-      subscription = subscription_fixture()
-      assert AccountContent.list_subscriptions() |> Repo.preload(:user) == [subscription]
+    test "list_subscriptions/1 returns all subscriptions" do
+      user = user_fixture()
+      subscription = subscription_fixture(user)
+
+      assert AccountContent.list_subscriptions(user.id) |> Repo.preload(:user) == [subscription]
     end
 
     test "get_subscription!/1 returns the subscription with given id" do

@@ -8,17 +8,8 @@ defmodule FeedMe.AccountContent do
 
   alias FeedMe.AccountContent.Subscription
 
-  @doc """
-  Returns the list of subscriptions.
-
-  ## Examples
-
-      iex> list_subscriptions()
-      [%Subscription{}, ...]
-
-  """
-  def list_subscriptions do
-    Repo.all(Subscription)
+  def list_subscriptions(user_id) do
+    Subscription |> where(user_id: ^user_id) |> Repo.all()
   end
 
   @doc """

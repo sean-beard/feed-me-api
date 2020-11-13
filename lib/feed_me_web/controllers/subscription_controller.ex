@@ -9,7 +9,7 @@ defmodule FeedMeWeb.SubscriptionController do
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
   def index(conn, _params) do
-    subscriptions = AccountContent.list_subscriptions()
+    subscriptions = AccountContent.list_subscriptions(conn.assigns.user.id)
     Conn.send_resp(conn, :ok, Jason.encode!(subscriptions))
   end
 
