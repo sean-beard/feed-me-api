@@ -10,7 +10,7 @@ defmodule FeedMe.Content.FeedItem do
 
   schema "feed_items" do
     field :description, :string
-    field :pub_date, :date
+    field :pub_date, :string
     field :title, :string
     field :url, :string
     belongs_to :feed, FeedMe.Content.Feed

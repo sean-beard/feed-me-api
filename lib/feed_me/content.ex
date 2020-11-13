@@ -284,12 +284,17 @@ defmodule FeedMe.Content do
   end
 
   defp convert_rss_items_to_db_items(items, feed_id) do
-    Enum.map(items, fn %{"title" => title, "description" => description, "link" => url} ->
-      # TODO: convert `item.pubDate` into Date format
+    Enum.map(items, fn %{
+                         "title" => title,
+                         "description" => description,
+                         "link" => url,
+                         "pubDate" => pub_date
+                       } ->
       %{
         title: title,
         description: :erlang.term_to_binary(description, [:compressed]),
         url: url,
+        pub_date: pub_date,
         feed_id: feed_id
       }
     end)
