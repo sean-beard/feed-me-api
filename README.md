@@ -39,5 +39,3 @@ Start the Phoenix server
 ```bash
 $ mix phx.server
 ```
-
-Navigate to http://localhost:4001 in your web browser.
