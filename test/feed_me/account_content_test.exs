@@ -1,6 +1,6 @@
 defmodule FeedMe.AccountContentTest do
   use FeedMe.DataCase
-  use FeedMe.Fixtures, [:user, :feed]
+  use FeedMe.Fixtures, [:user, :feed, :feed_item]
 
   alias FeedMe.AccountContent
 
@@ -11,8 +11,7 @@ defmodule FeedMe.AccountContentTest do
     @update_attrs %{is_subscribed: false}
     @invalid_attrs %{is_subscribed: nil}
 
-    def subscription_fixture do
-      user = user_fixture()
+    def subscription_fixture(user \\ user_fixture()) do
       feed = feed_fixture()
 
       {:ok, subscription} = AccountContent.create_subscription(user, feed)
@@ -20,9 +19,11 @@ defmodule FeedMe.AccountContentTest do
       subscription
     end
 
-    test "list_subscriptions/0 returns all subscriptions" do
-      subscription = subscription_fixture()
-      assert AccountContent.list_subscriptions() |> Repo.preload(:user) == [subscription]
+    test "list_subscriptions/1 returns all subscriptions" do
+      user = user_fixture()
+      subscription = subscription_fixture(user)
+
+      assert AccountContent.list_subscriptions(user.id) |> Repo.preload(:user) == [subscription]
     end
 
     test "get_subscription!/1 returns the subscription with given id" do
@@ -79,38 +80,49 @@ defmodule FeedMe.AccountContentTest do
   describe "feed_item_statuses" do
     alias FeedMe.AccountContent.FeedItemStatus
 
-    @valid_attrs %{is_read: true}
     @update_attrs %{is_read: false}
     @invalid_attrs %{is_read: nil}
 
-    def feed_item_status_fixture(attrs \\ %{}) do
-      {:ok, feed_item_status} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> AccountContent.create_feed_item_status()
+    def feed_item_status_fixture do
+      feed_item = feed_item_fixture()
+      user = user_fixture()
+      is_read = true
+
+      {:ok, feed_item_status} = AccountContent.create_feed_item_status(feed_item, user, is_read)
 
       feed_item_status
     end
 
     test "list_feed_item_statuses/0 returns all feed_item_statuses" do
       feed_item_status = feed_item_status_fixture()
-      assert AccountContent.list_feed_item_statuses() == [feed_item_status]
+      assert AccountContent.list_feed_item_statuses() |> Repo.preload(:user) == [feed_item_status]
     end
 
-    test "get_feed_item_status!/1 returns the feed_item_status with given id" do
+    test "get_feed_item_status/1 returns the feed_item_status with given id" do
       feed_item_status = feed_item_status_fixture()
-      assert AccountContent.get_feed_item_status!(feed_item_status.id) == feed_item_status
+
+      assert AccountContent.get_feed_item_status(feed_item_status.feed_item_id)
+             |> Repo.preload(:user) ==
+               feed_item_status
     end
 
-    test "create_feed_item_status/1 with valid data creates a feed_item_status" do
+    test "create_feed_item_status/3 with valid data creates a feed_item_status" do
+      feed_item = feed_item_fixture()
+      user = user_fixture()
+      is_read = true
+
       assert {:ok, %FeedItemStatus{} = feed_item_status} =
-               AccountContent.create_feed_item_status(@valid_attrs)
+               AccountContent.create_feed_item_status(feed_item, user, is_read)
 
       assert feed_item_status.is_read == true
     end
 
     test "create_feed_item_status/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = AccountContent.create_feed_item_status(@invalid_attrs)
+      feed_item = feed_item_fixture()
+      user = user_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               AccountContent.create_feed_item_status(feed_item, user, @invalid_attrs)
     end
 
     test "update_feed_item_status/2 with valid data updates the feed_item_status" do
@@ -128,16 +140,16 @@ defmodule FeedMe.AccountContentTest do
       assert {:error, %Ecto.Changeset{}} =
                AccountContent.update_feed_item_status(feed_item_status, @invalid_attrs)
 
-      assert feed_item_status == AccountContent.get_feed_item_status!(feed_item_status.id)
+      assert feed_item_status ==
+               AccountContent.get_feed_item_status(feed_item_status.feed_item_id)
+               |> Repo.preload(:user)
     end
 
     test "delete_feed_item_status/1 deletes the feed_item_status" do
       feed_item_status = feed_item_status_fixture()
       assert {:ok, %FeedItemStatus{}} = AccountContent.delete_feed_item_status(feed_item_status)
 
-      assert_raise Ecto.NoResultsError, fn ->
-        AccountContent.get_feed_item_status!(feed_item_status.id)
-      end
+      assert AccountContent.get_feed_item_status(feed_item_status.feed_item_id) == nil
     end
 
     test "change_feed_item_status/1 returns a feed_item_status changeset" do

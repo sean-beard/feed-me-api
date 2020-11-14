@@ -8,17 +8,8 @@ defmodule FeedMe.AccountContent do
 
   alias FeedMe.AccountContent.Subscription
 
-  @doc """
-  Returns the list of subscriptions.
-
-  ## Examples
-
-      iex> list_subscriptions()
-      [%Subscription{}, ...]
-
-  """
-  def list_subscriptions do
-    Repo.all(Subscription)
+  def list_subscriptions(user_id) do
+    Subscription |> where(user_id: ^user_id) |> Repo.all()
   end
 
   @doc """
@@ -39,6 +30,7 @@ defmodule FeedMe.AccountContent do
 
   @doc """
   Creates a subscription.
+  TODO: update docs
 
   ## Examples
 
@@ -120,21 +112,7 @@ defmodule FeedMe.AccountContent do
     Repo.all(FeedItemStatus)
   end
 
-  @doc """
-  Gets a single feed_item_status.
-
-  Raises `Ecto.NoResultsError` if the Feed item status does not exist.
-
-  ## Examples
-
-      iex> get_feed_item_status!(123)
-      %FeedItemStatus{}
-
-      iex> get_feed_item_status!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_feed_item_status!(id), do: Repo.get!(FeedItemStatus, id)
+  def get_feed_item_status(id), do: Repo.get_by(FeedItemStatus, feed_item_id: id)
 
   @doc """
   Creates a feed_item_status.
@@ -148,9 +126,12 @@ defmodule FeedMe.AccountContent do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_feed_item_status(attrs \\ %{}) do
-    %FeedItemStatus{}
-    |> FeedItemStatus.changeset(attrs)
+  def create_feed_item_status(feed_item, user, isRead) do
+    feed_item
+    |> Ecto.build_assoc(:feed_item_statuses)
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> FeedItemStatus.changeset(%{is_read: isRead})
     |> Repo.insert()
   end
 

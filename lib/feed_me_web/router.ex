@@ -34,8 +34,12 @@ defmodule FeedMeWeb.Router do
     options "/subscription", SubscriptionController, :nothing
 
     get "/feed", FeedController, :index
-    get "/item/:id", FeedController, :get_item
     options "/feed", FeedController, :nothing
+
+    post "/item", FeedController, :update_item_status
+    options "/item", FeedController, :nothing
+
+    get "/item/:id", FeedController, :get_item
     options "/item/:id", FeedController, :nothing
   end
 

@@ -4,6 +4,8 @@ defmodule FeedMe.Content do
   """
 
   import Ecto.Query, warn: false
+  alias FeedMe.AccountContent
+  alias FeedMe.AccountContent.FeedItemStatus
   alias FeedMe.Content.Feed
   alias FeedMe.Content.FeedItem
   alias FeedMe.Repo
@@ -18,12 +20,23 @@ defmodule FeedMe.Content do
       [%Feed{}, ...]
 
   """
-  def list_feeds do
-    # TODO: only get feeds for current user
-    Repo.all(Feed)
+  def list_feeds(user_id) do
+    feed_ids =
+      AccountContent.list_subscriptions(user_id)
+      |> Enum.map(fn %{feed_id: feed_id} -> feed_id end)
+
+    query =
+      from(
+        f in Feed,
+        # TODO: preload feed items here when cron job is set up
+        where: f.id in ^feed_ids,
+        select: f
+      )
+
+    Repo.all(query)
     |> Enum.map(fn feed ->
       insert_all_feed_items(feed)
-      items = list_feed_items(feed.id)
+      items = list_feed_items(feed.id, user_id)
       Map.put(feed, :items, items)
     end)
   end
@@ -112,10 +125,11 @@ defmodule FeedMe.Content do
 
   alias FeedMe.Content.FeedItem
 
-  def list_feed_items(feed_id) do
+  def list_feed_items(feed_id, user_id) do
     FeedItem
     |> where(feed_id: ^feed_id)
     |> Repo.all()
+    |> Repo.preload(feed_item_statuses: from(s in FeedItemStatus, where: s.user_id == ^user_id))
     |> Enum.map(fn item -> convert_db_item_to_json_item(item) end)
   end
 
@@ -133,7 +147,11 @@ defmodule FeedMe.Content do
       ** (Ecto.NoResultsError)
 
   """
-  def get_feed_item!(id), do: Repo.get!(FeedItem, id) |> convert_db_item_to_json_item
+  def get_feed_item!(id, user_id) do
+    Repo.get!(FeedItem, id)
+    |> Repo.preload(feed_item_statuses: from(s in FeedItemStatus, where: s.user_id == ^user_id))
+    |> convert_db_item_to_json_item
+  end
 
   @doc """
   Creates a feed_item.
@@ -248,16 +266,35 @@ defmodule FeedMe.Content do
   end
 
   defp convert_db_item_to_json_item(item) do
-    Map.put(item, :description, :erlang.binary_to_term(item.description))
+    is_read =
+      case Enum.at(item.feed_item_statuses, 0) do
+        nil ->
+          nil
+
+        status ->
+          status.is_read
+      end
+
+    item
+    |> Map.drop([:feed_item_statuses])
+    |> Map.put(:isRead, is_read)
+    |> Map.put(:pubDate, item.pub_date)
+    |> Map.drop([:pub_date])
+    |> Map.put(:description, :erlang.binary_to_term(item.description))
   end
 
   defp convert_rss_items_to_db_items(items, feed_id) do
-    Enum.map(items, fn %{"title" => title, "description" => description, "link" => url} ->
-      # TODO: convert `item.pubDate` into Date format
+    Enum.map(items, fn %{
+                         "title" => title,
+                         "description" => description,
+                         "link" => url,
+                         "pubDate" => pub_date
+                       } ->
       %{
         title: title,
         description: :erlang.term_to_binary(description, [:compressed]),
         url: url,
+        pub_date: pub_date,
         feed_id: feed_id
       }
     end)
