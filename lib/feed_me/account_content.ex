@@ -85,7 +85,7 @@ defmodule FeedMe.AccountContent do
   """
   def update_subscription(%Subscription{} = subscription, attrs) do
     subscription
-    |> Subscription.changeset(attrs)
+    |> change_subscription(attrs)
     |> Repo.update()
   end
 
