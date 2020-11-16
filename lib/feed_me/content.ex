@@ -46,6 +46,21 @@ defmodule FeedMe.Content do
 
   """
   def get_feed!(id), do: Repo.get!(Feed, id)
+
+  @doc """
+  Gets a single feed by URL.
+
+  Raises `Ecto.NoResultsError` if the Feed does not exist.
+
+  ## Examples
+
+      iex> get_feed_by_url!("https://my.rss.feed.com/feed.xml")
+      %Feed{}
+
+      iex> get_feed_by_url!("")
+      ** (Ecto.NoResultsError)
+
+  """
   def get_feed_by_url!(url), do: Repo.get_by!(Feed, url: url)
 
   @doc """
@@ -115,6 +130,15 @@ defmodule FeedMe.Content do
 
   alias FeedMe.Content.FeedItem
 
+  @doc """
+  Returns a list of feed items and their read/unread status.
+
+  ## Examples
+
+      iex> list_feed_items(feed_id, user_id)
+      [%FeedItem{}, ...]
+
+  """
   def list_feed_items(feed_id, user_id) do
     FeedItem
     |> where(feed_id: ^feed_id)
@@ -124,16 +148,16 @@ defmodule FeedMe.Content do
   end
 
   @doc """
-  Gets a single feed_item.
+  Gets a single feed_item and it's read/unread status.
 
   Raises `Ecto.NoResultsError` if the Feed item does not exist.
 
   ## Examples
 
-      iex> get_feed_item!(123)
+      iex> get_feed_item!(item_id, user_id)
       %FeedItem{}
 
-      iex> get_feed_item!(456)
+      iex> get_feed_item!(missing_item_id, user_id)
       ** (Ecto.NoResultsError)
 
   """

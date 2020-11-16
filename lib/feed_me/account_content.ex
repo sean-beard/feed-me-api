@@ -8,10 +8,28 @@ defmodule FeedMe.AccountContent do
 
   alias FeedMe.AccountContent.Subscription
 
+  @doc """
+  Returns a list of all subscriptions.
+
+  ## Examples
+
+      iex> list_subscriptions()
+      [%Subscription{}, ...]
+
+  """
   def list_subscriptions do
     Repo.all(Subscription)
   end
 
+  @doc """
+  Returns a list of user subscriptions.
+
+  ## Examples
+
+      iex> list_subscriptions(user_id)
+      [%Subscription{}, ...]
+
+  """
   def list_subscriptions(user_id) do
     Subscription |> where(user_id: ^user_id) |> Repo.all()
   end
@@ -33,15 +51,14 @@ defmodule FeedMe.AccountContent do
   def get_subscription!(id), do: Repo.get!(Subscription, id)
 
   @doc """
-  Creates a subscription.
-  TODO: update docs
+  Creates a feed subscription for a user.
 
   ## Examples
 
-      iex> create_subscription(%{field: value})
+      iex> create_subscription(user, feed)
       {:ok, %Subscription{}}
 
-      iex> create_subscription(%{field: bad_value})
+      iex> create_subscription(user, bad_feed)
       {:error, %Ecto.Changeset{}}
 
   """
@@ -123,10 +140,10 @@ defmodule FeedMe.AccountContent do
 
   ## Examples
 
-      iex> create_feed_item_status(%{field: value})
+      iex> create_feed_item_status(feed_item, user, is_read)
       {:ok, %FeedItemStatus{}}
 
-      iex> create_feed_item_status(%{field: bad_value})
+      iex> create_feed_item_status(bad_feed_item, user, is_read)
       {:error, %Ecto.Changeset{}}
 
   """
