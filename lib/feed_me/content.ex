@@ -144,7 +144,6 @@ defmodule FeedMe.Content do
     |> where(feed_id: ^feed_id)
     |> Repo.all()
     |> Repo.preload(feed_item_statuses: from(s in FeedItemStatus, where: s.user_id == ^user_id))
-    |> Enum.map(fn item -> convert_db_item_to_json_item(item) end)
   end
 
   @doc """
