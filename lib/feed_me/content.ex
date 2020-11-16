@@ -164,7 +164,6 @@ defmodule FeedMe.Content do
   def get_feed_item!(id, user_id) do
     Repo.get!(FeedItem, id)
     |> Repo.preload(feed_item_statuses: from(s in FeedItemStatus, where: s.user_id == ^user_id))
-    |> convert_db_item_to_json_item
   end
 
   @doc """
@@ -270,6 +269,17 @@ defmodule FeedMe.Content do
     |> Map.drop([:feed_items])
   end
 
+  def convert_db_item_to_json_item(item) do
+    is_read = is_feed_item_read(item)
+
+    item
+    |> Map.drop([:feed_item_statuses])
+    |> Map.put(:isRead, is_read)
+    |> Map.put(:pubDate, item.pub_date)
+    |> Map.drop([:pub_date])
+    |> Map.put(:description, :erlang.binary_to_term(item.description))
+  end
+
   defp get_feed_items_from_rss_url(url) do
     %Response{body: body} = HTTPoison.get!(url)
 
@@ -284,17 +294,6 @@ defmodule FeedMe.Content do
     } = XmlToMap.naive_map(body)
 
     items
-  end
-
-  defp convert_db_item_to_json_item(item) do
-    is_read = is_feed_item_read(item)
-
-    item
-    |> Map.drop([:feed_item_statuses])
-    |> Map.put(:isRead, is_read)
-    |> Map.put(:pubDate, item.pub_date)
-    |> Map.drop([:pub_date])
-    |> Map.put(:description, :erlang.binary_to_term(item.description))
   end
 
   defp is_feed_item_read(item) do

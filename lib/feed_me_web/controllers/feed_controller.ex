@@ -19,7 +19,9 @@ defmodule FeedMeWeb.FeedController do
   end
 
   def get_item(conn, %{"id" => feed_item_id}) do
-    item = Content.get_feed_item!(feed_item_id, conn.assigns.user.id)
+    item =
+      Content.get_feed_item!(feed_item_id, conn.assigns.user.id)
+      |> Content.convert_db_item_to_json_item()
 
     case item.isRead do
       nil ->
