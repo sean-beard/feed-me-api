@@ -287,14 +287,7 @@ defmodule FeedMe.Content do
   end
 
   defp convert_db_item_to_json_item(item) do
-    is_read =
-      case Enum.at(item.feed_item_statuses, 0) do
-        nil ->
-          nil
-
-        status ->
-          status.is_read
-      end
+    is_read = is_feed_item_read(item)
 
     item
     |> Map.drop([:feed_item_statuses])
@@ -302,6 +295,16 @@ defmodule FeedMe.Content do
     |> Map.put(:pubDate, item.pub_date)
     |> Map.drop([:pub_date])
     |> Map.put(:description, :erlang.binary_to_term(item.description))
+  end
+
+  defp is_feed_item_read(item) do
+    case Enum.at(item.feed_item_statuses, 0) do
+      nil ->
+        nil
+
+      status ->
+        status.is_read
+    end
   end
 
   defp convert_rss_items_to_db_items(items, feed_id) do
