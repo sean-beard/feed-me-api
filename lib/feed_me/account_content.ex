@@ -147,12 +147,12 @@ defmodule FeedMe.AccountContent do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_feed_item_status(feed_item, user, isRead) do
+  def create_feed_item_status(feed_item, user, is_read) do
     feed_item
     |> Ecto.build_assoc(:feed_item_statuses)
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, user)
-    |> FeedItemStatus.changeset(%{is_read: isRead})
+    |> FeedItemStatus.changeset(%{is_read: is_read})
     |> Repo.insert()
   end
 
