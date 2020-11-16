@@ -37,22 +37,22 @@ defmodule FeedMe.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.3"},
-      {:phoenix_ecto, "~> 4.1"},
+      {:cors_plug, "~> 1.5"},
       {:ecto_sql, "~> 3.4"},
-      {:postgrex, ">= 0.0.0"},
+      {:elixir_xml_to_map, "~> 2.0"},
+      {:gettext, "~> 0.11"},
+      {:httpoison, "~> 1.7"},
+      {:jason, "~> 1.0"},
+      {:phoenix_ecto, "~> 4.1"},
       {:phoenix_html, "~> 2.11"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_dashboard, "~> 0.2.0"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix, "~> 1.5.3"},
+      {:plug_cowboy, "~> 2.0"},
+      {:postgrex, ">= 0.0.0"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
-      {:gettext, "~> 0.11"},
-      {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
       {:ueberauth_github, "~> 0.7"},
-      {:httpoison, "~> 1.7"},
-      {:elixir_xml_to_map, "~> 2.0"},
-      {:cors_plug, "~> 1.5"},
 
       # Development/Test
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
