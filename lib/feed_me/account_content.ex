@@ -8,6 +8,10 @@ defmodule FeedMe.AccountContent do
 
   alias FeedMe.AccountContent.Subscription
 
+  def list_subscriptions do
+    Repo.all(Subscription)
+  end
+
   def list_subscriptions(user_id) do
     Subscription |> where(user_id: ^user_id) |> Repo.all()
   end

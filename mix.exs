@@ -50,6 +50,7 @@ defmodule FeedMe.MixProject do
       {:phoenix, "~> 1.5.3"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
+      {:quantum, "~> 3.0"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
       {:ueberauth_github, "~> 0.7"},

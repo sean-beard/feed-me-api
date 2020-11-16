@@ -14,7 +14,8 @@ defmodule FeedMe.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: FeedMe.PubSub},
       # Start the Endpoint (http/https)
-      FeedMeWeb.Endpoint
+      FeedMeWeb.Endpoint,
+      FeedMe.Scheduler
       # Start a worker by calling: FeedMe.Worker.start_link(arg)
       # {FeedMe.Worker, arg}
     ]

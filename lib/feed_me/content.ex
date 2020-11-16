@@ -241,7 +241,7 @@ defmodule FeedMe.Content do
     }
   end
 
-  defp insert_all_feed_items(feed) do
+  def insert_all_feed_items(feed) do
     db_feed_items =
       get_feed_items_from_rss_url(feed.url)
       |> convert_rss_items_to_db_items(feed.id)
