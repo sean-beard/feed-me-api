@@ -4,7 +4,6 @@ defmodule FeedMe.Content do
   """
 
   import Ecto.Query, warn: false
-  alias FeedMe.AccountContent
   alias FeedMe.AccountContent.FeedItemStatus
   alias FeedMe.Content.Feed
   alias FeedMe.Content.FeedItem
@@ -12,33 +11,24 @@ defmodule FeedMe.Content do
   alias HTTPoison.Response
 
   @doc """
-  Returns the list of feeds.
+  Returns a list of feeds given a list of feed IDs.
 
   ## Examples
 
-      iex> list_feeds()
+      iex> list_feeds(feed_ids)
       [%Feed{}, ...]
 
   """
-  def list_feeds(user_id) do
-    feed_ids =
-      AccountContent.list_subscriptions(user_id)
-      |> Enum.map(fn %{feed_id: feed_id} -> feed_id end)
-
+  def list_feeds(feed_ids) do
     query =
       from(
         f in Feed,
-        # TODO: preload feed items here when cron job is set up
+        preload: [feed_items: :feed_item_statuses],
         where: f.id in ^feed_ids,
         select: f
       )
 
     Repo.all(query)
-    |> Enum.map(fn feed ->
-      insert_all_feed_items(feed)
-      items = list_feed_items(feed.id, user_id)
-      Map.put(feed, :items, items)
-    end)
   end
 
   @doc """
@@ -247,6 +237,13 @@ defmodule FeedMe.Content do
       |> convert_rss_items_to_db_items(feed.id)
 
     Repo.insert_all(FeedItem, db_feed_items, on_conflict: :nothing)
+  end
+
+  def convert_db_feed_to_json_feed(feed) do
+    items = Enum.map(feed.feed_items, &convert_db_item_to_json_item/1)
+
+    Map.put(feed, :items, items)
+    |> Map.drop([:feed_items])
   end
 
   defp get_feed_items_from_rss_url(url) do

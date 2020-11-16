@@ -9,7 +9,12 @@ defmodule FeedMeWeb.FeedController do
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
   def index(conn, _params) do
-    feeds = Content.list_feeds(conn.assigns.user.id)
+    feeds =
+      AccountContent.list_subscriptions(conn.assigns.user.id)
+      |> Enum.map(fn %{feed_id: feed_id} -> feed_id end)
+      |> Content.list_feeds()
+      |> Enum.map(&Content.convert_db_feed_to_json_feed/1)
+
     Conn.send_resp(conn, :ok, Jason.encode!(feeds))
   end
 
