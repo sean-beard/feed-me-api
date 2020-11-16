@@ -1,18 +1,6 @@
-# FeedMe
+# FeedMe Backend
 
-RSS feed management application.
-
-## Features
-
-- Get a chronological, personalized newsfeed that you create
-- Users can mark feed items as read/unread
-- Grouping
-  - All
-  - By feed
-- Filtering logic similar to native iOS mail application (available per group)
-  - All vs unread
-  - Flagged (not MVP)
-- Users can flag items to save for later (not MVP)
+RSS feed management application allowing users to get a personalized newsfeed that they create.
 
 ## Development
 
@@ -51,5 +39,3 @@ Start the Phoenix server
 ```bash
 $ mix phx.server
 ```
-
-Navigate to http://localhost:4001 in your web browser.
