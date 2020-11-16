@@ -7,7 +7,6 @@ defmodule FeedMe.AccountContentTest do
   describe "subscriptions" do
     alias FeedMe.AccountContent.Subscription
 
-    @valid_attrs %{is_subscribed: true}
     @update_attrs %{is_subscribed: false}
     @invalid_attrs %{is_subscribed: nil}
 
