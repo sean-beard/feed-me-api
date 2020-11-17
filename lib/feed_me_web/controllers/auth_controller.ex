@@ -42,7 +42,7 @@ defmodule FeedMeWeb.AuthController do
         conn
         |> send_resp(
           :internal_server_error,
-          Jason.encode!(%{status: 200, message: "Error signing in."})
+          Jason.encode!(%{status: 500, message: "Error signing in."})
         )
     end
   end

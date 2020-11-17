@@ -4,7 +4,6 @@ defmodule FeedMe.Content do
   """
 
   import Ecto.Query, warn: false
-  alias FeedMe.AccountContent
   alias FeedMe.AccountContent.FeedItemStatus
   alias FeedMe.Content.Feed
   alias FeedMe.Content.FeedItem
@@ -12,33 +11,24 @@ defmodule FeedMe.Content do
   alias HTTPoison.Response
 
   @doc """
-  Returns the list of feeds.
+  Returns a list of feeds given a list of feed IDs.
 
   ## Examples
 
-      iex> list_feeds()
+      iex> list_feeds(feed_ids)
       [%Feed{}, ...]
 
   """
-  def list_feeds(user_id) do
-    feed_ids =
-      AccountContent.list_subscriptions(user_id)
-      |> Enum.map(fn %{feed_id: feed_id} -> feed_id end)
-
+  def list_feeds(feed_ids) do
     query =
       from(
         f in Feed,
-        # TODO: preload feed items here when cron job is set up
+        preload: [feed_items: :feed_item_statuses],
         where: f.id in ^feed_ids,
         select: f
       )
 
     Repo.all(query)
-    |> Enum.map(fn feed ->
-      insert_all_feed_items(feed)
-      items = list_feed_items(feed.id, user_id)
-      Map.put(feed, :items, items)
-    end)
   end
 
   @doc """
@@ -56,6 +46,21 @@ defmodule FeedMe.Content do
 
   """
   def get_feed!(id), do: Repo.get!(Feed, id)
+
+  @doc """
+  Gets a single feed by URL.
+
+  Raises `Ecto.NoResultsError` if the Feed does not exist.
+
+  ## Examples
+
+      iex> get_feed_by_url!("https://my.rss.feed.com/feed.xml")
+      %Feed{}
+
+      iex> get_feed_by_url!("")
+      ** (Ecto.NoResultsError)
+
+  """
   def get_feed_by_url!(url), do: Repo.get_by!(Feed, url: url)
 
   @doc """
@@ -125,32 +130,39 @@ defmodule FeedMe.Content do
 
   alias FeedMe.Content.FeedItem
 
+  @doc """
+  Returns a list of feed items and their read/unread status.
+
+  ## Examples
+
+      iex> list_feed_items(feed_id, user_id)
+      [%FeedItem{}, ...]
+
+  """
   def list_feed_items(feed_id, user_id) do
     FeedItem
     |> where(feed_id: ^feed_id)
     |> Repo.all()
     |> Repo.preload(feed_item_statuses: from(s in FeedItemStatus, where: s.user_id == ^user_id))
-    |> Enum.map(fn item -> convert_db_item_to_json_item(item) end)
   end
 
   @doc """
-  Gets a single feed_item.
+  Gets a single feed_item and it's read/unread status.
 
   Raises `Ecto.NoResultsError` if the Feed item does not exist.
 
   ## Examples
 
-      iex> get_feed_item!(123)
+      iex> get_feed_item!(item_id, user_id)
       %FeedItem{}
 
-      iex> get_feed_item!(456)
+      iex> get_feed_item!(missing_item_id, user_id)
       ** (Ecto.NoResultsError)
 
   """
   def get_feed_item!(id, user_id) do
     Repo.get!(FeedItem, id)
     |> Repo.preload(feed_item_statuses: from(s in FeedItemStatus, where: s.user_id == ^user_id))
-    |> convert_db_item_to_json_item
   end
 
   @doc """
@@ -249,6 +261,24 @@ defmodule FeedMe.Content do
     Repo.insert_all(FeedItem, db_feed_items, on_conflict: :nothing)
   end
 
+  def convert_db_feed_to_json_feed(feed) do
+    items = Enum.map(feed.feed_items, &convert_db_item_to_json_item/1)
+
+    Map.put(feed, :items, items)
+    |> Map.drop([:feed_items])
+  end
+
+  def convert_db_item_to_json_item(item) do
+    is_read = is_feed_item_read(item)
+
+    item
+    |> Map.drop([:feed_item_statuses])
+    |> Map.put(:isRead, is_read)
+    |> Map.put(:pubDate, item.pub_date)
+    |> Map.drop([:pub_date])
+    |> Map.put(:description, :erlang.binary_to_term(item.description))
+  end
+
   defp get_feed_items_from_rss_url(url) do
     %Response{body: body} = HTTPoison.get!(url)
 
@@ -265,22 +295,14 @@ defmodule FeedMe.Content do
     items
   end
 
-  defp convert_db_item_to_json_item(item) do
-    is_read =
-      case Enum.at(item.feed_item_statuses, 0) do
-        nil ->
-          nil
+  defp is_feed_item_read(item) do
+    case Enum.at(item.feed_item_statuses, 0) do
+      nil ->
+        nil
 
-        status ->
-          status.is_read
-      end
-
-    item
-    |> Map.drop([:feed_item_statuses])
-    |> Map.put(:isRead, is_read)
-    |> Map.put(:pubDate, item.pub_date)
-    |> Map.drop([:pub_date])
-    |> Map.put(:description, :erlang.binary_to_term(item.description))
+      status ->
+        status.is_read
+    end
   end
 
   defp convert_rss_items_to_db_items(items, feed_id) do

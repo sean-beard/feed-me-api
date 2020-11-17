@@ -8,11 +8,6 @@ defmodule FeedMeWeb.SubscriptionController do
   # This plug will execute before every handler in this list
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
-  def index(conn, _params) do
-    subscriptions = AccountContent.list_subscriptions(conn.assigns.user.id)
-    Conn.send_resp(conn, :ok, Jason.encode!(subscriptions))
-  end
-
   def create(conn, %{"url" => url}) do
     feed = Content.get_feed_from_rss_url(url)
 
@@ -21,8 +16,13 @@ defmodule FeedMeWeb.SubscriptionController do
         create_subscription(conn, feed)
 
       {:error, feed_changeset} ->
-        log_create_feed_error(feed_changeset.errors)
-        create_subscription(conn, Content.get_feed_by_url!(url))
+        if get_feed_constraint_type(feed_changeset.errors) == :unique do
+          IO.puts("Feed already exists. Creating subscription...")
+          create_subscription(conn, Content.get_feed_by_url!(url))
+        else
+          IO.puts("Error creating new feed from url: #{url}")
+          Conn.send_resp(conn, :internal_server_error, "Error creating feed")
+        end
     end
   end
 
@@ -42,15 +42,10 @@ defmodule FeedMeWeb.SubscriptionController do
           IO.puts("Subscription already exists.")
           Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, message: "Already subscribed"}))
         else
-          log_create_error(nil, "subscription")
+          IO.puts("Error creating new subscription for feed #{feed.id}")
           Conn.send_resp(conn, :internal_server_error, "Error creating subscription")
         end
     end
-  end
-
-  defp log_create_feed_error(errors) do
-    [email: {_message, [constraint: constraint_type, constraint_name: _name]}] = errors
-    log_create_error(constraint_type, "feed")
   end
 
   defp get_subscription_constraint_type(errors) do
@@ -58,11 +53,8 @@ defmodule FeedMeWeb.SubscriptionController do
     constraint_type
   end
 
-  defp log_create_error(constraint_type, name) do
-    if constraint_type == :unique do
-      IO.puts("Error creating new #{name}: #{name} already exists.")
-    else
-      IO.puts("Error creating new #{name}.")
-    end
+  defp get_feed_constraint_type(errors) do
+    [email: {_message, [constraint: constraint_type, constraint_name: _name]}] = errors
+    constraint_type
   end
 end

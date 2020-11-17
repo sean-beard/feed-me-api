@@ -15,11 +15,10 @@ defmodule FeedMe.ContentTest do
     }
     @invalid_attrs %{description: nil, name: nil, url: nil}
 
-    # TODO: re-implement when we're using a cron job to store feed items
-    # test "list_feeds/0 returns all feeds" do
-    #   feed = feed_fixture()
-    #   assert Content.list_feeds() == [feed]
-    # end
+    test "list_feeds/1 returns all feeds for list of IDs" do
+      feed = feed_fixture() |> Repo.preload(:feed_items)
+      assert Content.list_feeds([feed.id]) == [feed]
+    end
 
     test "get_feed!/1 returns the feed with given id" do
       feed = feed_fixture()
