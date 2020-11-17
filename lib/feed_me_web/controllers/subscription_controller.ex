@@ -8,11 +8,6 @@ defmodule FeedMeWeb.SubscriptionController do
   # This plug will execute before every handler in this list
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
-  def index(conn, _params) do
-    subscriptions = AccountContent.list_subscriptions(conn.assigns.user.id)
-    Conn.send_resp(conn, :ok, Jason.encode!(subscriptions))
-  end
-
   def create(conn, %{"url" => url}) do
     feed = Content.get_feed_from_rss_url(url)
 

@@ -29,7 +29,7 @@ defmodule FeedMeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    get "/subscription", SubscriptionController, :index
+
     post "/subscription", SubscriptionController, :create
     options "/subscription", SubscriptionController, :nothing
 
