@@ -13,6 +13,7 @@ defmodule FeedMeWeb.SubscriptionController do
 
     case Content.create_feed(feed) do
       {:ok, feed} ->
+        Content.insert_all_feed_items(feed)
         create_subscription(conn, feed)
 
       {:error, feed_changeset} ->
