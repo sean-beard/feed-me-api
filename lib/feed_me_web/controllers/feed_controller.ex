@@ -16,7 +16,7 @@ defmodule FeedMeWeb.FeedController do
       |> Content.list_feeds()
       |> Enum.map(&Content.convert_db_feed_to_json_feed/1)
 
-    Conn.send_resp(conn, :ok, Jason.encode!(feeds))
+    Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feeds: feeds}))
   end
 
   def get_item(conn, %{"id" => feed_item_id}) do
@@ -28,18 +28,32 @@ defmodule FeedMeWeb.FeedController do
       nil ->
         case create_status(conn, item, false) do
           nil ->
-            Conn.send_resp(conn, :internal_server_error, "Error getting feed item status")
+            Conn.send_resp(
+              conn,
+              :internal_server_error,
+              Jason.encode!(%{
+                status: 500,
+                message: "Error getting feed item status"
+              })
+            )
 
           status ->
             encoded_item =
               Map.put(item, :isRead, status.is_read)
               |> Jason.encode!()
 
-            Conn.send_resp(conn, :ok, encoded_item)
+            Conn.send_resp(
+              conn,
+              :ok,
+              Jason.encode!(%{
+                status: 200,
+                item: encoded_item
+              })
+            )
         end
 
       _is_read ->
-        Conn.send_resp(conn, :ok, Jason.encode!(item))
+        Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, item: item}))
     end
   end
 
@@ -53,13 +67,20 @@ defmodule FeedMeWeb.FeedController do
 
         case create_status(conn, item, is_read) do
           nil ->
-            Conn.send_resp(conn, :internal_server_error, "Error updating feed item status")
+            Conn.send_resp(
+              conn,
+              :internal_server_error,
+              Jason.encode!(%{
+                status: 500,
+                message: "Error updating feed item status"
+              })
+            )
 
           status ->
             Conn.send_resp(
               conn,
               :ok,
-              Jason.encode!(%{status: 200, message: "Success", isRead: status.is_read})
+              Jason.encode!(%{status: 200, isRead: status.is_read})
             )
         end
 
@@ -69,7 +90,15 @@ defmodule FeedMeWeb.FeedController do
 
       _error ->
         IO.puts("Error getting feed item status for ID #{feed_item_id}")
-        Conn.send_resp(conn, :internal_server_error, "Error updating feed item status")
+
+        Conn.send_resp(
+          conn,
+          :internal_server_error,
+          Jason.encode!(%{
+            status: 500,
+            message: "Error updating feed item status"
+          })
+        )
     end
   end
 
@@ -85,7 +114,14 @@ defmodule FeedMeWeb.FeedController do
         )
 
       {:error, _changeset} ->
-        Conn.send_resp(conn, :internal_server_error, "Error updating feed item status")
+        Conn.send_resp(
+          conn,
+          :internal_server_error,
+          Jason.encode!(%{
+            status: 500,
+            message: "Error updating feed item status"
+          })
+        )
     end
   end
 
