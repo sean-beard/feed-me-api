@@ -19,16 +19,14 @@ defmodule FeedMe.Content do
       [%Feed{}, ...]
 
   """
-  def list_feeds(feed_ids) do
-    query =
-      from(
-        f in Feed,
-        preload: [feed_items: :feed_item_statuses],
-        where: f.id in ^feed_ids,
-        select: f
-      )
-
-    Repo.all(query)
+  def list_feeds(feed_ids, user_id) do
+    Repo.all(
+      from f in Feed,
+        join: i in assoc(f, :feed_items),
+        join: s in assoc(i, :feed_item_statuses),
+        where: f.id in ^feed_ids and s.user_id == ^user_id,
+        preload: [feed_items: {i, feed_item_statuses: s}]
+    )
   end
 
   @doc """
