@@ -133,7 +133,13 @@ defmodule FeedMe.AccountContent do
     Repo.all(FeedItemStatus)
   end
 
-  def get_feed_item_status(id), do: Repo.get_by(FeedItemStatus, feed_item_id: id)
+  def get_feed_item_status(feed_item_id, user_id) do
+    Repo.all(
+      from s in FeedItemStatus,
+        where: s.feed_item_id == ^feed_item_id and s.user_id == ^user_id,
+        select: s
+    )
+  end
 
   @doc """
   Creates a feed_item_status.

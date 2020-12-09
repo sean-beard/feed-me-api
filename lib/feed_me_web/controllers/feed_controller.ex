@@ -61,11 +61,13 @@ defmodule FeedMeWeb.FeedController do
 
   # TODO: look into upsert here
   def update_item_status(conn, %{"id" => feed_item_id, "isRead" => is_read}) do
-    case AccountContent.get_feed_item_status(feed_item_id) do
+    user_id = conn.assigns.user.id
+
+    case AccountContent.get_feed_item_status(feed_item_id, user_id) do
       nil ->
         IO.puts("No feed item status found for ID #{feed_item_id}")
 
-        item = Content.get_feed_item!(feed_item_id, conn.assigns.user.id)
+        item = Content.get_feed_item!(feed_item_id, user_id)
 
         case create_status(conn, item, is_read) do
           nil ->
@@ -86,7 +88,7 @@ defmodule FeedMeWeb.FeedController do
             )
         end
 
-      status = %AccountContent.FeedItemStatus{} ->
+      [status = %AccountContent.FeedItemStatus{}] ->
         IO.puts("Feed item status found for ID #{feed_item_id}")
         update_status(conn, status, is_read)
 
