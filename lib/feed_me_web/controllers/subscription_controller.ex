@@ -13,7 +13,6 @@ defmodule FeedMeWeb.SubscriptionController do
 
     case Content.create_feed(feed) do
       {:ok, feed} ->
-        Content.insert_all_feed_items(feed)
         create_subscription(conn, feed)
 
       {:error, feed_changeset} ->
@@ -28,8 +27,13 @@ defmodule FeedMeWeb.SubscriptionController do
   end
 
   defp create_subscription(conn, feed) do
-    case AccountContent.create_subscription(conn.assigns.user, feed) do
+    user = conn.assigns.user
+
+    case AccountContent.create_subscription(user, feed) do
       {:ok, _subscription} ->
+        Content.insert_all_feed_items(feed)
+        AccountContent.insert_feed_item_statuses(user, feed)
+
         Conn.send_resp(
           conn,
           :ok,
