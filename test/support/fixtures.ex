@@ -60,12 +60,12 @@ defmodule FeedMe.Fixtures do
       }
 
       def feed_item_fixture(attrs \\ %{}) do
-        {:ok, user} =
+        {:ok, feed_item} =
           attrs
           |> Enum.into(@valid_attrs)
           |> Content.create_feed_item()
 
-        user
+        feed_item
       end
     end
   end
