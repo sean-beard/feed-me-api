@@ -70,6 +70,21 @@ defmodule FeedMe.Fixtures do
     end
   end
 
+  def feed_item_status do
+    alias FeedMe.AccountContent
+
+    quote do
+      def feed_item_status_fixture(user, feed_item) do
+        feed_item = feed_item_fixture()
+        is_read = true
+
+        {:ok, feed_item_status} = AccountContent.create_feed_item_status(feed_item, user, is_read)
+
+        feed_item_status
+      end
+    end
+  end
+
   @doc """
   Apply the `fixtures`.
   """
