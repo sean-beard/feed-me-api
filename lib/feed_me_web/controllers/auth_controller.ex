@@ -35,7 +35,15 @@ defmodule FeedMeWeb.AuthController do
         |> put_session(:user_id, user.id)
         |> send_resp(
           :ok,
-          Jason.encode!(%{status: 200, message: "Successfully signed in.", token: user.token})
+          Jason.encode!(%{
+            status: 200,
+            message: "Successfully signed in.",
+            user: %{
+              name: user.name,
+              email: user.email,
+              token: user.token
+            }
+          })
         )
 
       {:error, _reason} ->

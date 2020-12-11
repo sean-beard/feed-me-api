@@ -60,12 +60,27 @@ defmodule FeedMe.Fixtures do
       }
 
       def feed_item_fixture(attrs \\ %{}) do
-        {:ok, user} =
+        {:ok, feed_item} =
           attrs
           |> Enum.into(@valid_attrs)
           |> Content.create_feed_item()
 
-        user
+        feed_item
+      end
+    end
+  end
+
+  def feed_item_status do
+    alias FeedMe.AccountContent
+
+    quote do
+      def feed_item_status_fixture(user, feed_item) do
+        feed_item = feed_item_fixture()
+        is_read = true
+
+        {:ok, feed_item_status} = AccountContent.create_feed_item_status(feed_item, user, is_read)
+
+        feed_item_status
       end
     end
   end

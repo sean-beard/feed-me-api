@@ -133,7 +133,13 @@ defmodule FeedMe.AccountContent do
     Repo.all(FeedItemStatus)
   end
 
-  def get_feed_item_status(id), do: Repo.get_by(FeedItemStatus, feed_item_id: id)
+  def get_feed_item_status(feed_item_id, user_id) do
+    Repo.all(
+      from s in FeedItemStatus,
+        where: s.feed_item_id == ^feed_item_id and s.user_id == ^user_id,
+        select: s
+    )
+  end
 
   @doc """
   Creates a feed_item_status.
@@ -201,5 +207,13 @@ defmodule FeedMe.AccountContent do
   """
   def change_feed_item_status(%FeedItemStatus{} = feed_item_status, attrs \\ %{}) do
     FeedItemStatus.changeset(feed_item_status, attrs)
+  end
+
+  def insert_feed_item_statuses(user, feed) do
+    feed_with_items = feed |> Repo.preload(:feed_items)
+
+    Enum.each(feed_with_items.feed_items, fn item ->
+      create_feed_item_status(item, user, false)
+    end)
   end
 end
