@@ -10,11 +10,17 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :feed_me, FeedMeWeb.Endpoint,
-  url: [host: "example.com", port: 80],
+  http: [port: {:system, "PORT"}],
+  url: [scheme: "https", host: "feed-me-staging.herokuapp.com", port: 443],
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
 config :logger, level: :info
+
+config :ueberauth, Ueberauth.Strategy.Github.OAuth,
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
 
 # ## SSL Support
 #
