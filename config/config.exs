@@ -31,40 +31,6 @@ config :ueberauth, Ueberauth,
     github: {Ueberauth.Strategy.Github, [default_scope: "user:email", send_redirect_uri: false]}
   ]
 
-defmodule DotEnv do
-  def get_env(key) do
-    case File.read("#{File.cwd!()}/.env") do
-      {:ok, env_config} ->
-        get_config_value_from_key(key, env_config)
-
-      {:error, _reason} ->
-        ""
-    end
-  end
-
-  defp get_config_value_from_key(key, env_config) do
-    config_line =
-      String.split(env_config, "\n")
-      |> Enum.filter(fn x -> String.contains?(x, "=") end)
-      |> Enum.find("", fn x -> key == String.slice(x, 0, get_index_of(x, "=")) end)
-
-    if String.contains?(config_line, "=") do
-      String.slice(config_line, get_index_of(config_line, "=") + 1, String.length(config_line))
-    else
-      ""
-    end
-  end
-
-  defp get_index_of(string_content, string_to_match) do
-    {index_of_equals, _num_chars} = :binary.match(string_content, string_to_match)
-    index_of_equals
-  end
-end
-
-config :ueberauth, Ueberauth.Strategy.Github.OAuth,
-  client_id: DotEnv.get_env("GITHUB_CLIENT_ID"),
-  client_secret: DotEnv.get_env("GITHUB_CLIENT_SECRET")
-
 config :feed_me, FeedMe.Scheduler,
   jobs: [
     # At midnight every night
