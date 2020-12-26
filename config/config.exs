@@ -31,12 +31,6 @@ config :ueberauth, Ueberauth,
     github: {Ueberauth.Strategy.Github, [default_scope: "user:email", send_redirect_uri: false]}
   ]
 
-config :feed_me, FeedMe.Scheduler,
-  jobs: [
-    # At midnight every night
-    {"@daily", {FeedMe.AccountContent.FeedItemStorage, :store, []}}
-  ]
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

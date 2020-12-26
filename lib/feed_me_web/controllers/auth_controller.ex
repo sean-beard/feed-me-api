@@ -21,6 +21,16 @@ defmodule FeedMeWeb.AuthController do
     sign_in(conn, changeset)
   end
 
+  def callback(%{assigns: %{ueberauth_failure: %{errors: errors}}} = conn, _params) do
+    IO.puts("Error authenticating via Ueberauth...")
+
+    conn
+    |> send_resp(
+      :internal_server_error,
+      Jason.encode!(%{status: 500, message: "Error signing in."})
+    )
+  end
+
   @spec logout(Plug.Conn.t(), any) :: Plug.Conn.t()
   def logout(conn, _params) do
     conn
