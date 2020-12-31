@@ -10,53 +10,25 @@ defmodule FeedMeWeb.FeedController do
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
   def index(conn, _params) do
-    user_id = conn.assigns.user.id
+    user = conn.assigns.user
 
     feeds_json =
-      AccountContent.list_subscriptions(user_id)
+      AccountContent.list_subscriptions(user.id)
       |> Enum.map(fn %{feed_id: feed_id} -> feed_id end)
-      |> Content.list_feeds(user_id)
-      |> Enum.map(&Content.convert_db_feed_to_json_feed/1)
+      |> Content.list_feeds()
+      |> Enum.map(fn feed -> Content.convert_db_feed_to_json_feed(feed, user) end)
 
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feeds: feeds_json}))
   end
 
   def get_item(conn, %{"id" => feed_item_id}) do
+    user = conn.assigns.user
+
     item =
-      Content.get_feed_item!(feed_item_id, conn.assigns.user.id)
-      |> Content.convert_db_item_to_json_item()
+      Content.get_feed_item!(feed_item_id, user.id)
+      |> Content.convert_db_item_to_json_item(user)
 
-    case item.isRead do
-      nil ->
-        case create_status(conn, item, false) do
-          nil ->
-            Conn.send_resp(
-              conn,
-              :internal_server_error,
-              Jason.encode!(%{
-                status: 500,
-                message: "Error getting feed item status"
-              })
-            )
-
-          status ->
-            encoded_item =
-              Map.put(item, :isRead, status.is_read)
-              |> Jason.encode!()
-
-            Conn.send_resp(
-              conn,
-              :ok,
-              Jason.encode!(%{
-                status: 200,
-                item: encoded_item
-              })
-            )
-        end
-
-      _is_read ->
-        Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, item: item}))
-    end
+    Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, item: item}))
   end
 
   # TODO: look into upsert here

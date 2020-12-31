@@ -4,6 +4,7 @@ defmodule FeedMe.Content do
   """
 
   import Ecto.Query, warn: false
+  alias FeedMe.AccountContent
   alias FeedMe.AccountContent.FeedItemStatus
   alias FeedMe.Content.Feed
   alias FeedMe.Content.FeedItem
@@ -19,13 +20,12 @@ defmodule FeedMe.Content do
       [%Feed{}, ...]
 
   """
-  def list_feeds(feed_ids, user_id) do
+  def list_feeds(feed_ids) do
     Repo.all(
       from f in Feed,
         join: i in assoc(f, :feed_items),
-        join: s in assoc(i, :feed_item_statuses),
-        where: f.id in ^feed_ids and s.user_id == ^user_id,
-        preload: [feed_items: {i, feed_item_statuses: s}]
+        where: f.id in ^feed_ids,
+        preload: [feed_items: i]
     )
   end
 
@@ -259,15 +259,15 @@ defmodule FeedMe.Content do
     Repo.insert_all(FeedItem, db_feed_items, on_conflict: :nothing)
   end
 
-  def convert_db_feed_to_json_feed(feed) do
-    items = Enum.map(feed.feed_items, &convert_db_item_to_json_item/1)
+  def convert_db_feed_to_json_feed(feed, user) do
+    items = Enum.map(feed.feed_items, fn item -> convert_db_item_to_json_item(item, user) end)
 
     Map.put(feed, :items, items)
     |> Map.drop([:feed_items])
   end
 
-  def convert_db_item_to_json_item(item) do
-    is_read = is_feed_item_read(item)
+  def convert_db_item_to_json_item(item, user) do
+    is_read = is_feed_item_read(item, user)
 
     item
     |> Map.drop([:feed_item_statuses])
@@ -293,12 +293,13 @@ defmodule FeedMe.Content do
     items
   end
 
-  defp is_feed_item_read(item) do
-    case Enum.at(item.feed_item_statuses, 0) do
-      nil ->
-        nil
+  defp is_feed_item_read(item, user) do
+    case AccountContent.get_feed_item_status(item.id, user.id) do
+      [] ->
+        AccountContent.create_feed_item_status(item, user, false)
+        false
 
-      status ->
+      [status = %AccountContent.FeedItemStatus{}] ->
         status.is_read
     end
   end
