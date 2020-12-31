@@ -12,13 +12,13 @@ defmodule FeedMeWeb.FeedController do
   def index(conn, _params) do
     user_id = conn.assigns.user.id
 
-    feeds =
+    feeds_json =
       AccountContent.list_subscriptions(user_id)
       |> Enum.map(fn %{feed_id: feed_id} -> feed_id end)
       |> Content.list_feeds(user_id)
       |> Enum.map(&Content.convert_db_feed_to_json_feed/1)
 
-    Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feeds: feeds}))
+    Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feeds: feeds_json}))
   end
 
   def get_item(conn, %{"id" => feed_item_id}) do
