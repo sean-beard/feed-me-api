@@ -3,7 +3,6 @@ defmodule FeedMe.AccountContentTest do
   use FeedMe.Fixtures, [:user, :feed, :feed_item, :feed_item_status]
 
   alias FeedMe.AccountContent
-  alias FeedMe.Content
 
   describe "subscriptions" do
     alias FeedMe.AccountContent.Subscription
