@@ -23,9 +23,8 @@ defmodule FeedMe.Content do
   def list_feeds(feed_ids) do
     Repo.all(
       from f in Feed,
-        join: i in assoc(f, :feed_items),
         where: f.id in ^feed_ids,
-        preload: [feed_items: i]
+        preload: [:feed_items]
     )
   end
 

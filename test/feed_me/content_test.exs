@@ -15,25 +15,10 @@ defmodule FeedMe.ContentTest do
     }
     @invalid_attrs %{description: nil, name: nil, url: nil}
 
-    # TODO: fix this
-    # test "list_feeds/2 returns all feeds for list of IDs" do
-    #   user = user_fixture()
-    #   feed = feed_fixture()
-    #   feed_item = feed_item_fixture(%{feed_id: feed.id})
-
-    #   feed_item_status = feed_item_status_fixture(user, feed_item)
-
-    #   feed_item_with_status =
-    #     feed_item
-    #     |> Map.put(:feed_item_statuses, [feed_item_status])
-
-    #   pre_loaded_feed =
-    #     feed
-    #     |> Map.put(:feed_items, [feed_item_with_status])
-    #     |> Repo.preload(feed_items: :feed_item_statuses)
-
-    #   assert Content.list_feeds([feed.id], user.id) == [pre_loaded_feed]
-    # end
+    test "list_feeds/1 returns all feeds for list of IDs" do
+      feed = feed_fixture() |> Repo.preload(:feed_items)
+      assert Content.list_feeds([feed.id]) == [feed]
+    end
 
     test "get_feed!/1 returns the feed with given id" do
       feed = feed_fixture()
