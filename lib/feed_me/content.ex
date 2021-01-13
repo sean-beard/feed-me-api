@@ -227,27 +227,50 @@ defmodule FeedMe.Content do
     FeedItem.changeset(feed_item, attrs)
   end
 
-  def get_feed_from_rss_url(url) do
+  def get_feed_from_rss_url(url_input) do
+    url =
+      if is_youtube_channel_url(url_input) do
+        channel_id = get_youtube_channel_id(url_input)
+        "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
+      else
+        url_input
+      end
+
     %Response{body: body} = HTTPoison.get!(url)
 
-    %{
-      "rss" => %{
-        "#content" => %{
-          "channel" => %{
-            "description" => description,
-            # "item" => items,
-            # "link" => link,
-            "title" => name
+    case XmlToMap.naive_map(body) do
+      %{
+        "rss" => %{
+          "#content" => %{
+            "channel" => %{
+              "description" => description,
+              # "item" => items,
+              # "link" => link,
+              "title" => name
+            }
           }
         }
-      }
-    } = XmlToMap.naive_map(body)
+      } ->
+        %{
+          name: name,
+          url: url,
+          description: description
+        }
 
-    %{
-      name: name,
-      url: url,
-      description: description
-    }
+      %{
+        "feed" => %{
+          "title" => name,
+          "author" => %{
+            "uri" => description
+          }
+        }
+      } ->
+        %{
+          name: name,
+          url: url,
+          description: description
+        }
+    end
   end
 
   def insert_all_feed_items(feed) do
@@ -282,20 +305,42 @@ defmodule FeedMe.Content do
     |> Map.put(:description, :erlang.binary_to_term(item.description))
   end
 
+  defp is_youtube_channel_url(url) do
+    String.contains?(url, "youtube.com/channel/")
+  end
+
+  defp get_youtube_channel_id(url) do
+    channel_id = String.split(url, "youtube.com/channel/") |> Enum.at(-1)
+
+    if String.contains?(channel_id, "?") do
+      String.split(channel_id, "?") |> Enum.at(0)
+    else
+      channel_id
+    end
+  end
+
   defp get_feed_items_from_rss_url(url) do
     %Response{body: body} = HTTPoison.get!(url)
 
-    %{
-      "rss" => %{
-        "#content" => %{
-          "channel" => %{
-            "item" => items
+    case XmlToMap.naive_map(body) do
+      %{
+        "rss" => %{
+          "#content" => %{
+            "channel" => %{
+              "item" => items
+            }
           }
         }
-      }
-    } = XmlToMap.naive_map(body)
+      } ->
+        items
 
-    items
+      %{
+        "feed" => %{
+          "entry" => items
+        }
+      } ->
+        items
+    end
   end
 
   defp is_feed_item_read(item, user) do
@@ -310,19 +355,40 @@ defmodule FeedMe.Content do
   end
 
   defp convert_rss_items_to_db_items(items, feed_id) do
-    Enum.map(items, fn %{
-                         "title" => title,
-                         "description" => description,
-                         "link" => url,
-                         "pubDate" => pub_date
-                       } ->
+    Enum.map(items, fn item -> convert_rss_item_to_db_item(item, feed_id) end)
+  end
+
+  defp convert_rss_item_to_db_item(item, feed_id) do
+    case item do
       %{
-        title: title,
-        description: :erlang.term_to_binary(description, [:compressed]),
-        url: url,
-        pub_date: pub_date,
-        feed_id: feed_id
-      }
-    end)
+        "title" => title,
+        "description" => description,
+        "link" => url,
+        "pubDate" => pub_date
+      } ->
+        %{
+          title: title,
+          description: :erlang.term_to_binary(description, [:compressed]),
+          url: url,
+          pub_date: pub_date,
+          feed_id: feed_id
+        }
+
+      %{
+        "title" => title,
+        "published" => pub_date,
+        "link" => %{
+          "#content" => description,
+          "-href" => url
+        }
+      } ->
+        %{
+          title: title,
+          description: :erlang.term_to_binary(description, [:compressed]),
+          url: url,
+          pub_date: pub_date,
+          feed_id: feed_id
+        }
+    end
   end
 end
