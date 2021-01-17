@@ -5,8 +5,6 @@ defmodule FeedMeWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
-    # TODO: don't do this
-    # plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug CORSPlug, origin: "*"
   end
