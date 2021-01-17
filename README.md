@@ -1,6 +1,10 @@
-# FeedMe Backend
+# FeedMe API
 
 RSS feed management application allowing users to get a personalized newsfeed that they create.
+
+[FeedMe Staging app](https://feed-me-staging.netlify.app/)
+
+[FeedMe Frontend](https://github.com/sean-beard/feed-me)
 
 ## Development
 
