@@ -5,7 +5,7 @@ defmodule FeedMe.AccountContent.Subscription do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:id, :is_subscribed]}
+  @derive {Jason.Encoder, only: [:id, :isSubscribed, :feedName]}
 
   schema "subscriptions" do
     field :is_subscribed, :boolean, default: false

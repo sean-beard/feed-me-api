@@ -259,10 +259,16 @@ defmodule FeedMe.Content do
   end
 
   def convert_db_feed_to_json_feed(feed, user) do
-    items = Enum.map(feed.feed_items, fn item -> convert_db_item_to_json_item(item, user) end)
+    case feed.feed_items do
+      %Ecto.Association.NotLoaded{} ->
+        feed
 
-    Map.put(feed, :items, items)
-    |> Map.drop([:feed_items])
+      _ ->
+        items = Enum.map(feed.feed_items, fn item -> convert_db_item_to_json_item(item, user) end)
+
+        Map.put(feed, :items, items)
+        |> Map.drop([:feed_items])
+    end
   end
 
   def convert_db_item_to_json_item(item, user) do
