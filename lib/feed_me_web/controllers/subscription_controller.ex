@@ -8,7 +8,7 @@ defmodule FeedMeWeb.SubscriptionController do
   # This plug will execute before every handler in this list
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
-  def create(conn, %{"url" => url}) do
+  def subscribe(conn, %{"url" => url}) do
     feed = Content.get_feed_from_rss_url(url)
 
     case Content.create_feed(feed) do
