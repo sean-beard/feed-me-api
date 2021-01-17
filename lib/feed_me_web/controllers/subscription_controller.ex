@@ -53,6 +53,7 @@ defmodule FeedMeWeb.SubscriptionController do
         update_subscription(conn, subscription, %{is_subscribed: true})
 
       [] ->
+        Content.insert_all_feed_items(feed)
         create_subscription(conn, feed)
     end
   end
@@ -80,7 +81,6 @@ defmodule FeedMeWeb.SubscriptionController do
 
     case AccountContent.create_subscription(user, feed) do
       {:ok, _subscription} ->
-        Content.insert_all_feed_items(feed)
         AccountContent.insert_feed_item_statuses(user, feed)
 
         Conn.send_resp(
