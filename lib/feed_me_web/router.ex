@@ -28,7 +28,9 @@ defmodule FeedMeWeb.Router do
 
     get "/", PageController, :index
 
-    post "/subscription", SubscriptionController, :create
+    get "/subscription", SubscriptionController, :index
+    post "/subscription", SubscriptionController, :subscribe
+    delete "/subscription", SubscriptionController, :unsubscribe
     options "/subscription", SubscriptionController, :nothing
 
     get "/feed", FeedController, :index

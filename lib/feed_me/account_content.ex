@@ -31,7 +31,10 @@ defmodule FeedMe.AccountContent do
 
   """
   def list_subscriptions(user_id) do
-    Subscription |> where(user_id: ^user_id) |> Repo.all()
+    Subscription
+    |> where(user_id: ^user_id)
+    |> Repo.all()
+    |> Enum.filter(fn sub -> sub.is_subscribed end)
   end
 
   @doc """
@@ -49,6 +52,14 @@ defmodule FeedMe.AccountContent do
 
   """
   def get_subscription!(id), do: Repo.get!(Subscription, id)
+
+  def get_subscription(feed_id, user_id) do
+    Repo.all(
+      from s in Subscription,
+        where: s.feed_id == ^feed_id and s.user_id == ^user_id,
+        select: s
+    )
+  end
 
   @doc """
   Creates a feed subscription for a user.
@@ -116,6 +127,12 @@ defmodule FeedMe.AccountContent do
   """
   def change_subscription(%Subscription{} = subscription, attrs \\ %{}) do
     Subscription.changeset(subscription, attrs)
+  end
+
+  def convert_subscription_to_json(subscription) do
+    subscription
+    |> Map.put(:isSubscribed, subscription.is_subscribed)
+    |> Map.put(:feedName, subscription.feed.name)
   end
 
   alias FeedMe.AccountContent.FeedItemStatus
