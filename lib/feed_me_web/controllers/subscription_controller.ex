@@ -24,6 +24,7 @@ defmodule FeedMeWeb.SubscriptionController do
   end
 
   def subscribe(conn, %{"url" => url}) do
+    # TODO: send unsupported format error if this fails
     feed = Content.get_feed_from_rss_url(url)
 
     case Content.create_feed(feed) do
