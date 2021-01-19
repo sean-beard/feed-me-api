@@ -58,7 +58,14 @@ defmodule FeedMe.Content do
       ** (Ecto.NoResultsError)
 
   """
-  def get_feed_by_url!(url), do: Repo.get_by!(Feed, url: url)
+  def get_feed_by_url!(url) do
+    if is_youtube_channel_url(url) do
+      channel_rss_url = get_rss_url_from_youtube_url(url)
+      Repo.get_by!(Feed, url: channel_rss_url)
+    else
+      Repo.get_by!(Feed, url: url)
+    end
+  end
 
   @doc """
   Creates a feed.
@@ -230,8 +237,7 @@ defmodule FeedMe.Content do
   def get_feed_from_rss_url(url_input) do
     url =
       if is_youtube_channel_url(url_input) do
-        channel_id = get_youtube_channel_id(url_input)
-        "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
+        get_rss_url_from_youtube_url(url_input)
       else
         url_input
       end
@@ -317,6 +323,11 @@ defmodule FeedMe.Content do
     else
       channel_id
     end
+  end
+
+  defp get_rss_url_from_youtube_url(url) do
+    channel_id = get_youtube_channel_id(url)
+    "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
   end
 
   defp get_feed_items_from_rss_url(url) do
