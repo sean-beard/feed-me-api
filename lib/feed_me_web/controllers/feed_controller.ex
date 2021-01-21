@@ -35,6 +35,10 @@ defmodule FeedMeWeb.FeedController do
   def update_item_status(conn, %{"id" => feed_item_id, "isRead" => is_read}) do
     user_id = conn.assigns.user.id
 
+    create_or_update_feed_item_status(conn, feed_item_id, user_id, is_read)
+  end
+
+  defp create_or_update_feed_item_status(conn, feed_item_id, user_id, is_read) do
     case AccountContent.get_feed_item_status(feed_item_id, user_id) do
       nil ->
         IO.puts("No feed item status found for ID #{feed_item_id}")
