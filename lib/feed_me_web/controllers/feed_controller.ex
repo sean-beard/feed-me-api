@@ -30,32 +30,23 @@ defmodule FeedMeWeb.FeedController do
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, item: item}))
   end
 
-  def update_item_status(conn, %{"id" => feed_item_id, "isRead" => is_read}) do
+  def update_item_statuses(conn, %{"items" => items}) do
     user_id = conn.assigns.user.id
 
-    create_or_update_feed_item_status(conn, feed_item_id, user_id, is_read)
+    items
+    |> Enum.each(fn %{"id" => item_id, "isRead" => is_read} ->
+      create_or_update_feed_item_status(conn, item_id, user_id, is_read)
+    end)
+
+    Conn.send_resp(
+      conn,
+      :ok,
+      Jason.encode!(%{status: 200, message: "Success"})
+    )
   end
 
   defp create_or_update_feed_item_status(conn, feed_item_id, user_id, is_read) do
     item = Content.get_feed_item!(feed_item_id, user_id)
-
-    case AccountContent.create_feed_item_status(item, conn.assigns.user, is_read) do
-      {:ok, status} ->
-        Conn.send_resp(
-          conn,
-          :ok,
-          Jason.encode!(%{status: 200, message: "Success", isRead: status.is_read})
-        )
-
-      {:error, _changeset} ->
-        Conn.send_resp(
-          conn,
-          :internal_server_error,
-          Jason.encode!(%{
-            status: 500,
-            message: "Error updating feed item status"
-          })
-        )
-    end
+    AccountContent.create_feed_item_status(item, conn.assigns.user, is_read)
   end
 end
