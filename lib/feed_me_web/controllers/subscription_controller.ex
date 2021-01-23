@@ -3,6 +3,7 @@ defmodule FeedMeWeb.SubscriptionController do
 
   alias FeedMe.AccountContent
   alias FeedMe.Content
+  alias FeedMe.RssUtils
   alias Plug.Conn
 
   # This plug will execute before every handler in this list
@@ -25,7 +26,7 @@ defmodule FeedMeWeb.SubscriptionController do
 
   def subscribe(conn, %{"url" => url}) do
     # TODO: send unsupported format error if this fails
-    feed = Content.get_feed_from_rss_url(url)
+    feed = RssUtils.get_feed_from_rss_url(url)
 
     case Content.create_feed(feed) do
       {:ok, feed} ->
