@@ -14,6 +14,19 @@ defmodule FeedMe.RssUtils do
         url_input
       end
 
+    try do
+      fetch_feed_from_rss_url(url)
+    rescue
+      _any_error -> nil
+    end
+  end
+
+  def get_feed_items_from_rss_url(url, feed_id) do
+    get_rss_items_from_rss_url(url)
+    |> convert_rss_items_to_db_items(feed_id)
+  end
+
+  defp fetch_feed_from_rss_url(url) do
     %Response{body: body} = HTTPoison.get!(url)
 
     case XmlToMap.naive_map(body) do
@@ -46,12 +59,10 @@ defmodule FeedMe.RssUtils do
           url: url,
           description: description
         }
-    end
-  end
 
-  def get_feed_items_from_rss_url(url, feed_id) do
-    get_rss_items_from_rss_url(url)
-    |> convert_rss_items_to_db_items(feed_id)
+      _ ->
+        nil
+    end
   end
 
   defp get_rss_items_from_rss_url(url) do

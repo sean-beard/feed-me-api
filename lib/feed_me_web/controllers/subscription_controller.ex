@@ -25,9 +25,25 @@ defmodule FeedMeWeb.SubscriptionController do
   end
 
   def subscribe(conn, %{"url" => url}) do
-    # TODO: send unsupported format error if this fails
-    feed = RssUtils.get_feed_from_rss_url(url)
+    case RssUtils.get_feed_from_rss_url(url) do
+      nil ->
+        Conn.send_resp(
+          conn,
+          :unsupported_media_type,
+          "Unsupported RSS feed format."
+        )
 
+      feed ->
+        create_feed_and_subscription(conn, url, feed)
+    end
+  end
+
+  def unsubscribe(conn, %{"subscriptionId" => subscription_id}) do
+    subscription = AccountContent.get_subscription!(subscription_id)
+    update_subscription(conn, subscription, %{is_subscribed: false})
+  end
+
+  defp create_feed_and_subscription(conn, url, feed) do
     case Content.create_feed(feed) do
       {:ok, feed} ->
         update_or_create_subscription(conn, feed)
@@ -41,12 +57,6 @@ defmodule FeedMeWeb.SubscriptionController do
           Conn.send_resp(conn, :internal_server_error, "Error creating feed")
         end
     end
-  end
-
-  def unsubscribe(conn, %{"subscriptionId" => subscription_id}) do
-    subscription = AccountContent.get_subscription!(subscription_id)
-    # TODO: remove feed items from feed?
-    update_subscription(conn, subscription, %{is_subscribed: false})
   end
 
   defp update_or_create_subscription(conn, feed) do
