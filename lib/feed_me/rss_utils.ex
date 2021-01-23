@@ -49,7 +49,12 @@ defmodule FeedMe.RssUtils do
     end
   end
 
-  def get_feed_items_from_rss_url(url) do
+  def get_feed_items_from_rss_url(url, feed_id) do
+    get_rss_items_from_rss_url(url)
+    |> convert_rss_items_to_db_items(feed_id)
+  end
+
+  defp get_rss_items_from_rss_url(url) do
     %Response{body: body} = HTTPoison.get!(url)
 
     case XmlToMap.naive_map(body) do
@@ -70,10 +75,13 @@ defmodule FeedMe.RssUtils do
         }
       } ->
         items
+
+      _ ->
+        []
     end
   end
 
-  def convert_rss_items_to_db_items(items, feed_id) do
+  defp convert_rss_items_to_db_items(items, feed_id) do
     Enum.map(items, fn item -> convert_rss_item_to_db_item(item, feed_id) end)
   end
 

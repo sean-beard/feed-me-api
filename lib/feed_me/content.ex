@@ -236,11 +236,8 @@ defmodule FeedMe.Content do
   end
 
   def insert_all_feed_items(feed) do
-    db_feed_items =
-      RssUtils.get_feed_items_from_rss_url(feed.url)
-      |> RssUtils.convert_rss_items_to_db_items(feed.id)
-
-    Repo.insert_all(FeedItem, db_feed_items, on_conflict: :nothing)
+    feed_items = RssUtils.get_feed_items_from_rss_url(feed.url, feed.id)
+    Repo.insert_all(FeedItem, feed_items, on_conflict: :nothing)
   end
 
   def convert_db_feed_to_json_feed(feed, user) do
