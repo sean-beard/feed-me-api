@@ -9,6 +9,7 @@ defmodule FeedMe.Content do
   alias FeedMe.Content.Feed
   alias FeedMe.Content.FeedItem
   alias FeedMe.Repo
+  alias FeedMe.YouTubeUtils
   alias HTTPoison.Response
 
   @doc """
@@ -59,8 +60,8 @@ defmodule FeedMe.Content do
 
   """
   def get_feed_by_url!(url) do
-    if is_youtube_channel_url(url) do
-      channel_rss_url = get_rss_url_from_youtube_url(url)
+    if YouTubeUtils.is_youtube_channel_url(url) do
+      channel_rss_url = YouTubeUtils.get_rss_url_from_youtube_url(url)
       Repo.get_by!(Feed, url: channel_rss_url)
     else
       Repo.get_by!(Feed, url: url)
@@ -236,8 +237,8 @@ defmodule FeedMe.Content do
 
   def get_feed_from_rss_url(url_input) do
     url =
-      if is_youtube_channel_url(url_input) do
-        get_rss_url_from_youtube_url(url_input)
+      if YouTubeUtils.is_youtube_channel_url(url_input) do
+        YouTubeUtils.get_rss_url_from_youtube_url(url_input)
       else
         url_input
       end
@@ -309,25 +310,6 @@ defmodule FeedMe.Content do
     |> Map.put(:pubDate, item.pub_date)
     |> Map.drop([:pub_date])
     |> Map.put(:description, :erlang.binary_to_term(item.description))
-  end
-
-  defp is_youtube_channel_url(url) do
-    String.contains?(url, "youtube.com/channel/")
-  end
-
-  defp get_youtube_channel_id(url) do
-    channel_id = String.split(url, "youtube.com/channel/") |> Enum.at(-1)
-
-    if String.contains?(channel_id, "?") do
-      String.split(channel_id, "?") |> Enum.at(0)
-    else
-      channel_id
-    end
-  end
-
-  defp get_rss_url_from_youtube_url(url) do
-    channel_id = get_youtube_channel_id(url)
-    "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
   end
 
   defp get_feed_items_from_rss_url(url) do
