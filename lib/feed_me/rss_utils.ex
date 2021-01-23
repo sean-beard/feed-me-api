@@ -22,8 +22,6 @@ defmodule FeedMe.RssUtils do
           "#content" => %{
             "channel" => %{
               "description" => description,
-              # "item" => items,
-              # "link" => link,
               "title" => name
             }
           }
