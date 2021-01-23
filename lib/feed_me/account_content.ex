@@ -159,7 +159,7 @@ defmodule FeedMe.AccountContent do
   end
 
   @doc """
-  Creates a feed_item_status.
+  Creates a feed_item_status or updates an existing status.
 
   ## Examples
 
@@ -176,7 +176,10 @@ defmodule FeedMe.AccountContent do
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, user)
     |> FeedItemStatus.changeset(%{is_read: is_read})
-    |> Repo.insert()
+    |> Repo.insert(
+      on_conflict: [set: [is_read: is_read]],
+      conflict_target: [:user_id, :feed_item_id]
+    )
   end
 
   @doc """

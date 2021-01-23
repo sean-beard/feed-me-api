@@ -3,7 +3,6 @@ defmodule FeedMeWeb.FeedController do
 
   alias FeedMe.AccountContent
   alias FeedMe.Content
-  alias FeedMe.Content.FeedItem
   alias Plug.Conn
 
   # This plug will execute before every handler in this list
@@ -31,80 +30,23 @@ defmodule FeedMeWeb.FeedController do
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, item: item}))
   end
 
-  # TODO: look into upsert here
-  def update_item_status(conn, %{"id" => feed_item_id, "isRead" => is_read}) do
+  def update_item_statuses(conn, %{"items" => items}) do
     user_id = conn.assigns.user.id
 
-    case AccountContent.get_feed_item_status(feed_item_id, user_id) do
-      nil ->
-        IO.puts("No feed item status found for ID #{feed_item_id}")
+    items
+    |> Enum.each(fn %{"id" => item_id, "isRead" => is_read} ->
+      create_or_update_feed_item_status(conn, item_id, user_id, is_read)
+    end)
 
-        item = Content.get_feed_item!(feed_item_id, user_id)
-        create_status(conn, item, is_read)
-
-      [status = %AccountContent.FeedItemStatus{}] ->
-        IO.puts("Feed item status found for ID #{feed_item_id}")
-        update_status(conn, status, is_read)
-
-      _error ->
-        IO.puts("Error getting feed item status for ID #{feed_item_id}")
-
-        Conn.send_resp(
-          conn,
-          :internal_server_error,
-          Jason.encode!(%{
-            status: 500,
-            message: "Error updating feed item status"
-          })
-        )
-    end
+    Conn.send_resp(
+      conn,
+      :ok,
+      Jason.encode!(%{status: 200, message: "Success"})
+    )
   end
 
-  defp update_status(conn, status, is_read) do
-    IO.puts("Updating feed item status...")
-
-    case AccountContent.update_feed_item_status(status, %{is_read: is_read}) do
-      {:ok, status} ->
-        Conn.send_resp(
-          conn,
-          :ok,
-          Jason.encode!(%{status: 200, message: "Success", isRead: status.is_read})
-        )
-
-      {:error, _changeset} ->
-        Conn.send_resp(
-          conn,
-          :internal_server_error,
-          Jason.encode!(%{
-            status: 500,
-            message: "Error updating feed item status"
-          })
-        )
-    end
-  end
-
-  defp create_status(conn, %FeedItem{} = item, is_read) do
-    IO.puts("Creating new feed item status...")
-
-    case AccountContent.create_feed_item_status(item, conn.assigns.user, is_read) do
-      {:ok, status} ->
-        Conn.send_resp(
-          conn,
-          :ok,
-          Jason.encode!(%{status: 200, isRead: status.is_read})
-        )
-
-      {:error, _changeset} ->
-        IO.puts("Error creating feed item status for ID #{item.id}")
-
-        Conn.send_resp(
-          conn,
-          :internal_server_error,
-          Jason.encode!(%{
-            status: 500,
-            message: "Error updating feed item status"
-          })
-        )
-    end
+  defp create_or_update_feed_item_status(conn, feed_item_id, user_id, is_read) do
+    item = Content.get_feed_item!(feed_item_id, user_id)
+    AccountContent.create_feed_item_status(item, conn.assigns.user, is_read)
   end
 end
