@@ -1,21 +1,36 @@
 # FeedMe API
 
-RSS feed management application allowing users to get a personalized newsfeed that they create.
+RSS feed reader API allowing users to curate a truly personalized newsfeed.
 
-[FeedMe Staging app](https://feed-me-staging.netlify.app/)
+Users authenticate via GitHub and can subscribe to RSS feeds. If a feed doesn't exist in the database (i.e. no other user has subscribed to the feed before) a new feed record will be stored.
 
-[FeedMe Frontend](https://github.com/sean-beard/feed-me)
+Aditionally, available feed items will be stored. There is a job scheduled daily which will fetch and store new feed items.
+
+## Endpoints
+
+| Endpoint                |  Verb  |                               Description |
+| :---------------------- | :----: | ----------------------------------------: |
+| `/feed`                 |  GET   |                      Get the user's feed. |
+| `/item/:id`             |  GET   |                    Get a feed item by ID. |
+| `/item`                 |  PUT   |                     Upsert item statuses. |
+| `/subscription`         |  GET   |        Get the user's feed subscriptions. |
+| `/subscription`         |  POST  |                      Subscribe to a feed. |
+| `/subscription`         | DELETE |                  Unsubscribe from a feed. |
+| `/auth/logout`          |  GET   |                          Logout the user. |
+| `/auth/github`          |  GET   |                      Request GitHub auth. |
+| `/auth/github/callback` |  GET   | Login to the application via GitHub auth. |
 
 ## Development
 
-Make sure to have Elixir, Erlang and NodeJS installed on your machine. This application was developed with:
+Make sure to have Elixir, Erlang and Postgres installed on your machine. This application was developed with:
 
 - Elixir v1.10.4
 - Erlang v23.1
-- NodeJS v12.18.2
 - Postgres v12.2 (needs to be v9.5 or higher)
 
 You can run `mix docs` to generate the documentation for this project.
+
+[FeedMe frontend repository](https://github.com/sean-beard/feed-me)
 
 ### Getting started
 
@@ -43,3 +58,15 @@ Start the Phoenix server
 ```bash
 $ mix phx.server
 ```
+
+### Continuous Integration
+
+This project uses [CircleCI](https://circleci.com/) for continuous integration. Source code must be verified, built and successfully tested before it can be merged.
+
+[Credo](https://github.com/rrrene/credo) is used for static code analysis. [Mix](https://hexdocs.pm/mix/master/Mix.html) is used for code formatting.
+
+### Deployment
+
+This project uses [Heroku](https://www.heroku.com/) for deployment. The API is deployed to the Staging environment when code gets merged. Releases are promoted to Production manually via Heroku.
+
+[FeedMe Staging app](https://feed-me-staging.netlify.app/)
