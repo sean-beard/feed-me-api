@@ -10,7 +10,6 @@ defmodule FeedMe.Content do
   alias FeedMe.Content.FeedItem
   alias FeedMe.Repo
   alias FeedMe.RssUtils
-  alias FeedMe.YouTubeUtils
 
   @doc """
   Returns a list of feeds given a list of feed IDs.
@@ -59,13 +58,9 @@ defmodule FeedMe.Content do
       ** (Ecto.NoResultsError)
 
   """
-  def get_feed_by_url!(url) do
-    if YouTubeUtils.is_youtube_channel_url(url) do
-      channel_rss_url = YouTubeUtils.get_rss_url_from_youtube_url(url)
-      Repo.get_by!(Feed, url: channel_rss_url)
-    else
-      Repo.get_by!(Feed, url: url)
-    end
+  def get_feed_by_url!(url_input) do
+    url = RssUtils.get_rss_url(url_input)
+    Repo.get_by!(Feed, url: url)
   end
 
   @doc """

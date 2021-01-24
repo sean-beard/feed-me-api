@@ -6,13 +6,16 @@ defmodule FeedMe.RssUtils do
   alias FeedMe.YouTubeUtils
   alias HTTPoison.Response
 
+  def get_rss_url(url_input) do
+    if YouTubeUtils.is_youtube_channel_url(url_input) do
+      YouTubeUtils.get_rss_url_from_youtube_url(url_input)
+    else
+      url_input
+    end
+  end
+
   def get_feed_from_rss_url(url_input) do
-    url =
-      if YouTubeUtils.is_youtube_channel_url(url_input) do
-        YouTubeUtils.get_rss_url_from_youtube_url(url_input)
-      else
-        url_input
-      end
+    url = get_rss_url(url_input)
 
     try do
       fetch_feed_from_rss_url(url)
