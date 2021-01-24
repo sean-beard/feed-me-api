@@ -3,6 +3,16 @@ defmodule FeedMe.YouTubeUtils do
   This module is a utilty to handle YouTube-specific logic.
   """
 
+  alias HTTPoison.Response
+
+  def is_youtube_url(url) do
+    String.contains?(url, "youtube.com")
+  end
+
+  def is_youtube_rss_url(url) do
+    String.contains?(url, "youtube.com/feeds")
+  end
+
   def is_youtube_channel_url(url) do
     String.contains?(url, "youtube.com/channel/")
   end
@@ -10,6 +20,16 @@ defmodule FeedMe.YouTubeUtils do
   def get_rss_url_from_youtube_channel_url(url) do
     channel_id = get_youtube_channel_id(url)
     "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
+  end
+
+  def get_rss_url_from_youtube_url(url) do
+    channel_id = scrape_youtube_channel_id(url)
+    "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
+  end
+
+  defp scrape_youtube_channel_id(url) do
+    %Response{body: body} = HTTPoison.get!(url)
+    String.split(body, "\"externalId\":") |> Enum.at(-1) |> String.split("\"") |> Enum.at(1)
   end
 
   defp get_youtube_channel_id(url) do
