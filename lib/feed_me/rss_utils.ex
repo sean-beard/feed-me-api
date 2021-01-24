@@ -8,7 +8,7 @@ defmodule FeedMe.RssUtils do
 
   def get_rss_url(url_input) do
     if YouTubeUtils.is_youtube_channel_url(url_input) do
-      YouTubeUtils.get_rss_url_from_youtube_url(url_input)
+      YouTubeUtils.get_rss_url_from_youtube_channel_url(url_input)
     else
       url_input
     end

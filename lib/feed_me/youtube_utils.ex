@@ -7,7 +7,7 @@ defmodule FeedMe.YouTubeUtils do
     String.contains?(url, "youtube.com/channel/")
   end
 
-  def get_rss_url_from_youtube_url(url) do
+  def get_rss_url_from_youtube_channel_url(url) do
     channel_id = get_youtube_channel_id(url)
     "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
   end
