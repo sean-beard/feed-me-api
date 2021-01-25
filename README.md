@@ -1,5 +1,7 @@
 # FeedMe API
 
+https://feedme.digital
+
 RSS feed reader API allowing users to curate a truly personalized newsfeed.
 
 Users authenticate via GitHub and can subscribe to RSS feeds. If a feed doesn't exist in the database (i.e. no other user has subscribed to the feed before) a new feed record will be stored.
@@ -67,6 +69,4 @@ This project uses [CircleCI](https://circleci.com/) for continuous integration. 
 
 ### Deployment
 
-This project uses [Heroku](https://www.heroku.com/) for deployment. The API is deployed to the Staging environment when code gets merged. Releases are promoted to Production manually via Heroku.
-
-[FeedMe Staging app](https://feed-me-staging.netlify.app/)
+This project uses [Heroku](https://www.heroku.com/) for deployment. The API is deployed when code gets merged.
