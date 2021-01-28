@@ -6,7 +6,7 @@ defmodule FeedMe.YouTubeUtils do
   alias HTTPoison.Response
 
   def is_youtube_url(url) do
-    String.contains?(url, "youtube.com")
+    String.contains?(url, "youtube.com") || String.contains?(url, "youtu.be")
   end
 
   def is_youtube_rss_url(url) do
