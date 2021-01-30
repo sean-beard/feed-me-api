@@ -102,11 +102,11 @@ defmodule FeedMe.RssUtils do
 
   defp convert_rss_items_to_db_items(items, feed_id) do
     case items do
-      [_array = %{}] ->
-        Enum.map(items, fn item -> convert_rss_item_to_db_item(item, feed_id) end)
-
       single_item = %{} ->
         [convert_rss_item_to_db_item(single_item, feed_id)]
+
+      _array ->
+        Enum.map(items, fn item -> convert_rss_item_to_db_item(item, feed_id) end)
     end
   end
 
