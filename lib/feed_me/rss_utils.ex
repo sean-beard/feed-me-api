@@ -26,6 +26,8 @@ defmodule FeedMe.RssUtils do
       fetch_feed_from_rss_url(url)
     rescue
       _any_error -> nil
+    catch
+      _any_value -> nil
     end
   end
 
