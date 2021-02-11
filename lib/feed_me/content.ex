@@ -252,11 +252,12 @@ defmodule FeedMe.Content do
     is_read = is_feed_item_read(item, user)
 
     item
-    |> Map.drop([:feed_item_statuses])
     |> Map.put(:isRead, is_read)
     |> Map.put(:pubDate, item.pub_date)
-    |> Map.drop([:pub_date])
+    |> Map.put(:mediaType, item.media_type)
+    |> Map.put(:mediaUrl, item.media_url)
     |> Map.put(:description, :erlang.binary_to_term(item.description))
+    |> Map.drop([:feed_item_statuses, :pub_date, :media_type, :media_url])
   end
 
   defp is_feed_item_read(item, user) do
