@@ -15,11 +15,6 @@ defmodule FeedMe.ContentTest do
     }
     @invalid_attrs %{description: nil, name: nil, url: nil}
 
-    test "list_feeds/1 returns all feeds for list of IDs" do
-      feed = feed_fixture() |> Repo.preload(:feed_items)
-      assert Content.list_feeds([feed.id]) == [feed]
-    end
-
     test "get_feed!/1 returns the feed with given id" do
       feed = feed_fixture()
       assert Content.get_feed!(feed.id) == feed
