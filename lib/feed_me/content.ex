@@ -11,21 +11,66 @@ defmodule FeedMe.Content do
   alias FeedMe.Repo
   alias FeedMe.RssUtils
 
-  @doc """
-  Returns a list of feeds given a list of feed IDs.
+  def list_feed(user_id) do
+    query = """
+      select
+        i.id,
+        f.name as feed_name,
+        i.title,
+        i.description,
+        i.url,
+        s.is_read,
+        i.media_type,
+        i.media_url,
+        case
+          when i.pub_date like '___, % ___ %' then to_date(i.pub_date, 'DY, DD Mon YYYY')
+          when i.pub_date like '%-%-%' then to_date(i.pub_date, 'YYYY-MM-DD')
+        end as pub_date
+      from feed_items as i
+      inner join feeds as f
+        on i.feed_id = f.id
+      inner join feed_item_statuses as s
+        on s.user_id = #{user_id} and s.feed_item_id = i.id
+      where i.feed_id in (
+        select s.feed_id from subscriptions as s
+        where user_id = #{user_id} and is_subscribed = true
+      )
+      order by pub_date desc
+    """
 
-  ## Examples
+    case Repo.query(query) do
+      {:ok, result = %Postgrex.Result{}} ->
+        IO.puts("Found #{result.num_rows} feed items...")
 
-      iex> list_feeds(feed_ids)
-      [%Feed{}, ...]
+        result.rows
+        |> Enum.map(fn row -> Enum.zip(result.columns, row) end)
+        |> Enum.map(fn [
+                         {"id", id},
+                         {"feed_name", feed_name},
+                         {"title", title},
+                         {"description", desc_binary},
+                         {"url", url},
+                         {"is_read", is_read},
+                         {"media_type", media_type},
+                         {"media_url", media_url},
+                         {"pub_date", pub_date}
+                       ] ->
+          %{
+            id: id,
+            feedName: feed_name,
+            title: title,
+            description: :erlang.binary_to_term(desc_binary),
+            url: url,
+            isRead: is_read,
+            mediaType: media_type,
+            mediaUrl: media_url,
+            pubDate: pub_date
+          }
+        end)
 
-  """
-  def list_feeds(feed_ids) do
-    Repo.all(
-      from f in Feed,
-        where: f.id in ^feed_ids,
-        preload: [:feed_items]
-    )
+      _error ->
+        []
+    end
   end
 
   @doc """
@@ -233,19 +278,6 @@ defmodule FeedMe.Content do
   def insert_all_feed_items(feed) do
     feed_items = RssUtils.get_feed_items_from_rss_url(feed.url, feed.id)
     Repo.insert_all(FeedItem, feed_items, on_conflict: :nothing)
-  end
-
-  def convert_db_feed_to_json_feed(feed, user) do
-    case feed.feed_items do
-      %Ecto.Association.NotLoaded{} ->
-        feed
-
-      _ ->
-        items = Enum.map(feed.feed_items, fn item -> convert_db_item_to_json_item(item, user) end)
-
-        Map.put(feed, :items, items)
-        |> Map.drop([:feed_items])
-    end
   end
 
   def convert_db_item_to_json_item(item, user) do
