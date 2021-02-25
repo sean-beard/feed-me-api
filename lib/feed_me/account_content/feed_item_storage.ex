@@ -22,8 +22,8 @@ defmodule FeedMe.AccountContent.FeedItemStorage do
 
   defp get_feeds_with_subs do
     AccountContent.list_subscriptions()
+    |> Enum.uniq_by(fn sub -> sub.feed_id end)
     |> FeedMe.Repo.preload(:feed)
-    |> Enum.uniq_by(fn sub -> sub.feed.id end)
     |> Enum.map(fn sub -> sub.feed end)
   end
 
