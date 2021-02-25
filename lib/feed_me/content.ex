@@ -29,7 +29,7 @@ defmodule FeedMe.Content do
       from feed_items as i
       inner join feeds as f
         on i.feed_id = f.id
-      inner join feed_item_statuses as s
+      left join feed_item_statuses as s
         on s.user_id = #{user_id} and s.feed_item_id = i.id
       where i.feed_id in (
         select s.feed_id from subscriptions as s
