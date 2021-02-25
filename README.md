@@ -69,4 +69,4 @@ This project uses [CircleCI](https://circleci.com/) for continuous integration. 
 
 ### Deployment
 
-This project uses [Heroku](https://www.heroku.com/) for deployment. The API is deployed when code gets merged.
+This project uses [Gigalixir](https://www.gigalixir.com/) for deployment. As of now, the API is manually deployed via [the Gigalixir CLI](https://gigalixir.readthedocs.io/en/latest/cli.html).
