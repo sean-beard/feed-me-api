@@ -67,12 +67,6 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
-config :feed_me, FeedMe.Scheduler,
-  jobs: [
-    # At midnight every night
-    {"@daily", {FeedMe.AccountContent.FeedItemStorage, :store, []}}
-  ]
-
 defmodule DotEnv do
   def get_env(key) do
     case File.read("#{File.cwd!()}/.env") do
