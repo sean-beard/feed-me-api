@@ -170,14 +170,14 @@ defmodule FeedMe.AccountContent do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_feed_item_status(feed_item, user, is_read) do
+  def create_feed_item_status(feed_item, user, attrs) do
     feed_item
     |> Ecto.build_assoc(:feed_item_statuses)
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, user)
-    |> FeedItemStatus.changeset(%{is_read: is_read})
+    |> FeedItemStatus.changeset(attrs)
     |> Repo.insert(
-      on_conflict: [set: [is_read: is_read]],
+      on_conflict: [set: [is_read: attrs.is_read]],
       conflict_target: [:user_id, :feed_item_id]
     )
   end

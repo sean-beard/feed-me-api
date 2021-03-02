@@ -105,7 +105,7 @@ defmodule FeedMe.AccountContentTest do
       is_read = true
 
       assert {:ok, %FeedItemStatus{} = feed_item_status} =
-               AccountContent.create_feed_item_status(feed_item, user, is_read)
+               AccountContent.create_feed_item_status(feed_item, user, %{is_read: is_read})
 
       assert feed_item_status.is_read == true
     end

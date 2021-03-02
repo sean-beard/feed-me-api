@@ -78,7 +78,7 @@ defmodule FeedMe.Fixtures do
         feed_item = feed_item_fixture()
         is_read = true
 
-        {:ok, feed_item_status} = AccountContent.create_feed_item_status(feed_item, user, is_read)
+        {:ok, feed_item_status} = AccountContent.create_feed_item_status(feed_item, user, %{is_read: is_read})
 
         feed_item_status
       end

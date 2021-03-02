@@ -295,7 +295,7 @@ defmodule FeedMe.Content do
   defp is_feed_item_read(item, user) do
     case AccountContent.get_feed_item_status(item.id, user.id) do
       [] ->
-        AccountContent.create_feed_item_status(item, user, false)
+        AccountContent.create_feed_item_status(item, user, %{is_read: false})
         false
 
       [status = %AccountContent.FeedItemStatus{}] ->

@@ -40,6 +40,6 @@ defmodule FeedMeWeb.FeedController do
 
   defp create_or_update_feed_item_status(conn, feed_item_id, user_id, is_read) do
     item = Content.get_feed_item!(feed_item_id, user_id)
-    AccountContent.create_feed_item_status(item, conn.assigns.user, is_read)
+    AccountContent.create_feed_item_status(item, conn.assigns.user, %{is_read: is_read})
   end
 end
