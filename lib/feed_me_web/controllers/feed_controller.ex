@@ -28,6 +28,7 @@ defmodule FeedMeWeb.FeedController do
 
     items
     |> Enum.each(fn %{"id" => item_id, "isRead" => is_read} ->
+      # TODO: add audio current time in sec here
       create_or_update_feed_item_status(conn, item_id, user_id, is_read)
     end)
 
