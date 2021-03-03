@@ -8,6 +8,7 @@ defmodule FeedMe.AccountContent.FeedItemStatus do
 
   schema "feed_item_statuses" do
     field :is_read, :boolean, default: false
+    field :current_time_sec, :float
     belongs_to :feed_item, FeedMe.Content.FeedItem
     belongs_to :user, FeedMe.Account.User
 
@@ -17,7 +18,7 @@ defmodule FeedMe.AccountContent.FeedItemStatus do
   @doc false
   def changeset(feed_item_status, attrs) do
     feed_item_status
-    |> cast(attrs, [:is_read])
+    |> cast(attrs, [:is_read, :current_time_sec])
     |> validate_required([:is_read])
   end
 end

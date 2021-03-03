@@ -171,13 +171,15 @@ defmodule FeedMe.AccountContent do
 
   """
   def create_feed_item_status(feed_item, user, attrs) do
+    current_time_sec = Map.get(attrs, :current_time_sec, nil)
+
     feed_item
     |> Ecto.build_assoc(:feed_item_statuses)
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, user)
     |> FeedItemStatus.changeset(attrs)
     |> Repo.insert(
-      on_conflict: [set: [is_read: attrs.is_read]],
+      on_conflict: [set: [is_read: attrs.is_read, current_time_sec: current_time_sec]],
       conflict_target: [:user_id, :feed_item_id]
     )
   end
@@ -233,7 +235,7 @@ defmodule FeedMe.AccountContent do
     feed_with_items = feed |> Repo.preload(:feed_items)
 
     Enum.each(feed_with_items.feed_items, fn item ->
-      create_feed_item_status(item, user, false)
+      create_feed_item_status(item, user, %{is_read: false})
     end)
   end
 end

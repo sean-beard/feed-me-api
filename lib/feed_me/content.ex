@@ -20,6 +20,7 @@ defmodule FeedMe.Content do
         i.description,
         i.url,
         s.is_read,
+        s.current_time_sec,
         i.media_type,
         i.media_url,
         case
@@ -51,6 +52,7 @@ defmodule FeedMe.Content do
                          {"description", desc_binary},
                          {"url", url},
                          {"is_read", is_read},
+                         {"current_time_sec", current_time_sec},
                          {"media_type", media_type},
                          {"media_url", media_url},
                          {"pub_date", pub_date}
@@ -62,6 +64,7 @@ defmodule FeedMe.Content do
             description: :erlang.binary_to_term(desc_binary),
             url: url,
             isRead: is_read,
+            currentTime: current_time_sec,
             mediaType: media_type,
             mediaUrl: media_url,
             pubDate: pub_date
@@ -281,10 +284,11 @@ defmodule FeedMe.Content do
   end
 
   def convert_db_item_to_json_item(item, user) do
-    is_read = is_feed_item_read(item, user)
+    status = get_feed_item_status(item, user)
 
     item
-    |> Map.put(:isRead, is_read)
+    |> Map.put(:isRead, status.is_read)
+    |> Map.put(:currentTime, status.current_time_sec)
     |> Map.put(:pubDate, item.pub_date)
     |> Map.put(:mediaType, item.media_type)
     |> Map.put(:mediaUrl, item.media_url)
@@ -292,14 +296,16 @@ defmodule FeedMe.Content do
     |> Map.drop([:feed_item_statuses, :pub_date, :media_type, :media_url])
   end
 
-  defp is_feed_item_read(item, user) do
+  defp get_feed_item_status(item, user) do
     case AccountContent.get_feed_item_status(item.id, user.id) do
       [] ->
-        AccountContent.create_feed_item_status(item, user, %{is_read: false})
-        false
+        {:ok, %FeedItemStatus{} = status} =
+          AccountContent.create_feed_item_status(item, user, %{is_read: false})
+
+        status
 
       [status = %AccountContent.FeedItemStatus{}] ->
-        status.is_read
+        status
     end
   end
 end

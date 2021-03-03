@@ -27,9 +27,9 @@ defmodule FeedMeWeb.FeedController do
     user_id = conn.assigns.user.id
 
     items
-    |> Enum.each(fn %{"id" => item_id, "isRead" => is_read} ->
-      # TODO: add audio current time in sec here
-      create_or_update_feed_item_status(conn, item_id, user_id, is_read)
+    |> Enum.each(fn %{"id" => item_id, "isRead" => is_read, "currentTime" => current_time} ->
+      attrs = %{is_read: is_read, current_time_sec: current_time}
+      create_or_update_feed_item_status(conn, item_id, user_id, attrs)
     end)
 
     Conn.send_resp(
@@ -39,8 +39,8 @@ defmodule FeedMeWeb.FeedController do
     )
   end
 
-  defp create_or_update_feed_item_status(conn, feed_item_id, user_id, is_read) do
+  defp create_or_update_feed_item_status(conn, feed_item_id, user_id, attrs) do
     item = Content.get_feed_item!(feed_item_id, user_id)
-    AccountContent.create_feed_item_status(item, conn.assigns.user, %{is_read: is_read})
+    AccountContent.create_feed_item_status(item, conn.assigns.user, attrs)
   end
 end
