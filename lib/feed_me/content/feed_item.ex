@@ -7,7 +7,17 @@ defmodule FeedMe.Content.FeedItem do
   import Ecto.Changeset
 
   @derive {Jason.Encoder,
-           only: [:id, :title, :description, :url, :pubDate, :isRead, :mediaType, :mediaUrl]}
+           only: [
+             :id,
+             :title,
+             :description,
+             :url,
+             :pubDate,
+             :isRead,
+             :currentTime,
+             :mediaType,
+             :mediaUrl
+           ]}
 
   schema "feed_items" do
     field :description, :string
