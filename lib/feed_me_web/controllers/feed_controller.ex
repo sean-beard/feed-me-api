@@ -27,8 +27,16 @@ defmodule FeedMeWeb.FeedController do
     user_id = conn.assigns.user.id
 
     items
-    |> Enum.each(fn %{"id" => item_id, "isRead" => is_read, "currentTime" => current_time} ->
-      attrs = %{is_read: is_read, current_time_sec: current_time}
+    |> Enum.each(fn %{"id" => item_id} = item ->
+      attrs =
+        case item do
+          %{"id" => _item_id, "isRead" => is_read, "currentTime" => current_time} ->
+            %{is_read: is_read, current_time_sec: current_time}
+
+          %{"id" => _item_id, "isRead" => is_read} ->
+            %{is_read: is_read}
+        end
+
       create_or_update_feed_item_status(conn, item_id, user_id, attrs)
     end)
 
