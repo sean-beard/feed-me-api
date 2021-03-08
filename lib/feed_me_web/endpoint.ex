@@ -10,11 +10,11 @@ defmodule FeedMeWeb.Endpoint do
     signing_salt: "dPQvPcfV"
   ]
 
-  socket "/socket", FeedMeWeb.UserSocket,
-    websocket: true,
-    longpoll: false
+  # socket "/socket", FeedMeWeb.UserSocket,
+  #   websocket: true,
+  #   longpoll: false
 
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  # socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -35,9 +35,9 @@ defmodule FeedMeWeb.Endpoint do
     plug Phoenix.Ecto.CheckRepoStatus, otp_app: :feed_me
   end
 
-  plug Phoenix.LiveDashboard.RequestLogger,
-    param_key: "request_logger",
-    cookie_key: "request_logger"
+  # plug Phoenix.LiveDashboard.RequestLogger,
+  #   param_key: "request_logger",
+  #   cookie_key: "request_logger"
 
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
