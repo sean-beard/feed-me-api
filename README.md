@@ -24,7 +24,17 @@ Aditionally, available feed items will be stored. There is a job scheduled daily
 
 ## Development
 
-Make sure to have Elixir, Erlang and Postgres installed on your machine. This application was developed with:
+If you're using VSCode you can use the development container to contribute without installing any runtime dependencies on your machine. To do so, install the [VSCode Remote Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
+
+To open the dev container:
+
+⌘ + ⇧ + P -> "Remote-Containers: Rebuild and Reopen in Container"
+
+To close the dev container:
+
+⌘ + ⇧ + P -> "Remote-Containers: Reopen Locally"
+
+Otherwise, make sure to have Elixir, Erlang and Postgres installed on your machine. This application was developed with:
 
 - Elixir v1.10.4
 - Erlang v23.1
