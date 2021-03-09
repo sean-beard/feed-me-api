@@ -151,6 +151,7 @@ defmodule FeedMe.AccountContent do
   end
 
   def get_feed_item_status(feed_item_id, user_id) do
+    # TODO: update this to Repo.one
     Repo.all(
       from s in FeedItemStatus,
         where: s.feed_item_id == ^feed_item_id and s.user_id == ^user_id,
@@ -177,7 +178,7 @@ defmodule FeedMe.AccountContent do
     |> Ecto.Changeset.put_assoc(:user, user)
     |> FeedItemStatus.changeset(attrs)
     |> Repo.insert(
-      on_conflict: [set: [is_read: attrs.is_read, current_time_sec: attrs.current_time_sec]],
+      on_conflict: [set: [is_read: attrs.is_read, current_time_sec: attrs[:current_time_sec]]],
       conflict_target: [:user_id, :feed_item_id]
     )
   end

@@ -28,9 +28,21 @@ defmodule FeedMeWeb.FeedController do
 
     items
     |> Enum.each(fn %{"id" => item_id} = item ->
+      current_time_sec =
+        case item["currentTime"] do
+          nil ->
+            # We don't want to set `current_time_sec` to `nil` when updating only `is_read`
+            AccountContent.get_feed_item_status(item_id, user_id)
+            |> Enum.at(0)
+            |> Map.get(:current_time_sec)
+
+          time ->
+            time
+        end
+
       attrs = %{
         is_read: item["isRead"],
-        current_time_sec: item["currentTime"]
+        current_time_sec: current_time_sec
       }
 
       create_or_update_feed_item_status(conn, item_id, user_id, attrs)
