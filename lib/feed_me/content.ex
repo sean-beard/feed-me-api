@@ -8,6 +8,7 @@ defmodule FeedMe.Content do
   alias FeedMe.AccountContent.FeedItemStatus
   alias FeedMe.Content.Feed
   alias FeedMe.Content.FeedItem
+  alias FeedMe.Content.FeedItemDto
   alias FeedMe.Repo
   alias FeedMe.RssUtils
 
@@ -259,14 +260,17 @@ defmodule FeedMe.Content do
   def get_feed_item_dto(item, user) do
     status = get_feed_item_status(item, user)
 
-    item
-    |> Map.put(:isRead, status.is_read)
-    |> Map.put(:currentTime, status.current_time_sec)
-    |> Map.put(:pubDate, item.pub_date)
-    |> Map.put(:mediaType, item.media_type)
-    |> Map.put(:mediaUrl, item.media_url)
-    |> Map.put(:description, :erlang.binary_to_term(item.description))
-    |> Map.drop([:feed_item_statuses, :pub_date, :media_type, :media_url])
+    %FeedItemDto{
+      id: item.id,
+      title: item.title,
+      description: :erlang.binary_to_term(item.description),
+      url: item.url,
+      isRead: status.is_read,
+      currentTime: status.current_time_sec,
+      mediaType: item.media_type,
+      mediaUrl: item.media_url,
+      pubDate: item.pub_date
+    }
   end
 
   defp get_feed_item_dto(item_db_result) do
@@ -283,7 +287,7 @@ defmodule FeedMe.Content do
         {"media_url", media_url},
         {"pub_date", pub_date}
       ] ->
-        %{
+        %FeedItemDto{
           id: id,
           feedName: feed_name,
           title: title,
@@ -298,7 +302,7 @@ defmodule FeedMe.Content do
 
       _ ->
         IO.puts("Error processing feed data...")
-        %{}
+        %FeedItemDto{}
     end
   end
 
