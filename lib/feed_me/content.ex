@@ -42,34 +42,7 @@ defmodule FeedMe.Content do
     case Repo.query(query) do
       {:ok, result = %Postgrex.Result{}} ->
         IO.puts("Found #{result.num_rows} feed items...")
-
-        result.rows
-        |> Enum.map(fn row -> Enum.zip(result.columns, row) end)
-        |> Enum.map(fn [
-                         {"id", id},
-                         {"feed_name", feed_name},
-                         {"title", title},
-                         {"description", desc_binary},
-                         {"url", url},
-                         {"is_read", is_read},
-                         {"current_time_sec", current_time_sec},
-                         {"media_type", media_type},
-                         {"media_url", media_url},
-                         {"pub_date", pub_date}
-                       ] ->
-          %{
-            id: id,
-            feedName: feed_name,
-            title: title,
-            description: :erlang.binary_to_term(desc_binary),
-            url: url,
-            isRead: is_read,
-            currentTime: current_time_sec,
-            mediaType: media_type,
-            mediaUrl: media_url,
-            pubDate: pub_date
-          }
-        end)
+        process_db_feed_result(result)
 
       _error ->
         []
@@ -294,6 +267,45 @@ defmodule FeedMe.Content do
     |> Map.put(:mediaUrl, item.media_url)
     |> Map.put(:description, :erlang.binary_to_term(item.description))
     |> Map.drop([:feed_item_statuses, :pub_date, :media_type, :media_url])
+  end
+
+  defp get_feed_item_dto(item_db_result) do
+    case item_db_result do
+      [
+        {"id", id},
+        {"feed_name", feed_name},
+        {"title", title},
+        {"description", desc_binary},
+        {"url", url},
+        {"is_read", is_read},
+        {"current_time_sec", current_time_sec},
+        {"media_type", media_type},
+        {"media_url", media_url},
+        {"pub_date", pub_date}
+      ] ->
+        %{
+          id: id,
+          feedName: feed_name,
+          title: title,
+          description: :erlang.binary_to_term(desc_binary),
+          url: url,
+          isRead: is_read,
+          currentTime: current_time_sec,
+          mediaType: media_type,
+          mediaUrl: media_url,
+          pubDate: pub_date
+        }
+
+      _ ->
+        IO.puts("Error processing feed data...")
+        %{}
+    end
+  end
+
+  defp process_db_feed_result(result) do
+    result.rows
+    |> Enum.map(fn row -> Enum.zip(result.columns, row) end)
+    |> Enum.map(&get_feed_item_dto/1)
   end
 
   defp get_feed_item_status(item, user) do
