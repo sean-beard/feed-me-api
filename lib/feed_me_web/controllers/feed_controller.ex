@@ -18,7 +18,7 @@ defmodule FeedMeWeb.FeedController do
 
     item =
       Content.get_feed_item!(feed_item_id, user.id)
-      |> Content.convert_db_item_to_json_item(user)
+      |> Content.get_feed_item_dto(user)
 
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, item: item}))
   end

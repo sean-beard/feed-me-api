@@ -256,7 +256,7 @@ defmodule FeedMe.Content do
     Repo.insert_all(FeedItem, feed_items, on_conflict: :nothing)
   end
 
-  def convert_db_item_to_json_item(item, user) do
+  def get_feed_item_dto(item, user) do
     status = get_feed_item_status(item, user)
 
     item
