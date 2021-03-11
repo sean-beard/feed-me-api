@@ -10,12 +10,14 @@
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
-		"terminal.integrated.shell.linux": "/bin/bash"
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"workbench.colorTheme": "Visual Studio Light",
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"mjmcloug.vscode-elixir"
+		"jakebecker.elixir-ls",
+		"eamodio.gitlens",
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -24,6 +26,6 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "sh .devcontainer/entrypoint.sh",
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	// Uncomment to connect as a user other than `root`. More info: https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
 }

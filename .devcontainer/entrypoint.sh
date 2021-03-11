@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Installing dependencies..."
+mix deps.get
+
 echo "Setting up database runtime dependencies..."
 service postgresql start 
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';" 
