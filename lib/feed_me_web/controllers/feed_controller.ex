@@ -43,7 +43,7 @@ defmodule FeedMeWeb.FeedController do
         current_time_sec: current_time_sec
       }
 
-      create_or_update_feed_item_status(conn, item_id, attrs)
+      create_or_update_feed_item_status(conn.assigns.user, item_id, attrs)
     end)
 
     Conn.send_resp(
@@ -53,8 +53,8 @@ defmodule FeedMeWeb.FeedController do
     )
   end
 
-  defp create_or_update_feed_item_status(conn, feed_item_id, attrs) do
+  defp create_or_update_feed_item_status(user, feed_item_id, attrs) do
     item = Content.get_feed_item!(feed_item_id)
-    AccountContent.create_feed_item_status(item, conn.assigns.user, attrs)
+    AccountContent.create_feed_item_status(item, user, attrs)
   end
 end
