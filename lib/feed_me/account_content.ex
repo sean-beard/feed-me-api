@@ -55,9 +55,10 @@ defmodule FeedMe.AccountContent do
 
   def get_subscription(feed_id, user_id) do
     Repo.all(
-      from s in Subscription,
+      from(s in Subscription,
         where: s.feed_id == ^feed_id and s.user_id == ^user_id,
         select: s
+      )
     )
   end
 
@@ -153,9 +154,10 @@ defmodule FeedMe.AccountContent do
   def get_feed_item_status(feed_item_id, user_id) do
     # TODO: update this to Repo.one
     Repo.all(
-      from s in FeedItemStatus,
+      from(s in FeedItemStatus,
         where: s.feed_item_id == ^feed_item_id and s.user_id == ^user_id,
         select: s
+      )
     )
   end
 
