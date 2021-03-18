@@ -16,14 +16,28 @@ jobs:
       - elixir/build
       - elixir/check-format
       - run:
-          command: mix credo --strict --ignore tagtodo
           name: Static analysis to Elixir source code
+          command: mix credo --strict --ignore tagtodo
       - elixir/test
+  deploy:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run:
+          name: Deploy `master` to Gigalixir
+          command: git push gigalixir master
 
 workflows:
-  build-and-test:
+  build-test-deploy:
     jobs:
       - build-and-test:
           matrix:
             parameters:
               elixir-version: ["1.10.4"]
+      - deploy:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - master
