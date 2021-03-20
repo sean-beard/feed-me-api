@@ -137,6 +137,25 @@ defmodule FeedMe.RssUtils do
       %{
         "title" => title,
         "description" => description,
+        "pubDate" => pub_date,
+        "enclosure" => %{
+          "-type" => media_type,
+          "-url" => media_url
+        }
+      } ->
+        %{
+          title: title,
+          description: :erlang.term_to_binary(description, [:compressed]),
+          url: media_url,
+          pub_date: pub_date,
+          feed_id: feed_id,
+          media_type: media_type,
+          media_url: media_url
+        }
+
+      %{
+        "title" => title,
+        "description" => description,
         "link" => url,
         "pubDate" => pub_date
       } ->
