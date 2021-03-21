@@ -55,9 +55,10 @@ defmodule FeedMe.AccountContent do
 
   def get_subscription(feed_id, user_id) do
     Repo.all(
-      from s in Subscription,
+      from(s in Subscription,
         where: s.feed_id == ^feed_id and s.user_id == ^user_id,
         select: s
+      )
     )
   end
 
@@ -153,9 +154,10 @@ defmodule FeedMe.AccountContent do
   def get_feed_item_status(feed_item_id, user_id) do
     # TODO: update this to Repo.one
     Repo.all(
-      from s in FeedItemStatus,
+      from(s in FeedItemStatus,
         where: s.feed_item_id == ^feed_item_id and s.user_id == ^user_id,
         select: s
+      )
     )
   end
 
@@ -172,15 +174,36 @@ defmodule FeedMe.AccountContent do
 
   """
   def create_feed_item_status(feed_item, user, attrs) do
+    on_conflict_set =
+      if Map.has_key?(attrs, :current_time_sec) do
+        [is_read: attrs.is_read, current_time_sec: attrs.current_time_sec]
+      else
+        [is_read: attrs.is_read]
+      end
+
     feed_item
     |> Ecto.build_assoc(:feed_item_statuses)
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, user)
     |> FeedItemStatus.changeset(attrs)
     |> Repo.insert(
-      on_conflict: [set: [is_read: attrs.is_read, current_time_sec: attrs[:current_time_sec]]],
+      on_conflict: [set: on_conflict_set],
       conflict_target: [:user_id, :feed_item_id]
     )
+  end
+
+  def create_feed_item_statuses(user_id, feed) do
+    feed
+    |> Repo.preload(:feed_items)
+    |> Map.get(:feed_items, [])
+    |> get_db_statuses_from_db_items(user_id)
+    |> update_item_statuses
+  end
+
+  # TODO FeedItemStatus type assertions?
+  def create_or_update_feed_item_statuses(user_id, client_items) do
+    get_db_statuses_from_client_items(client_items, user_id)
+    |> update_item_statuses
   end
 
   @doc """
@@ -230,11 +253,60 @@ defmodule FeedMe.AccountContent do
     FeedItemStatus.changeset(feed_item_status, attrs)
   end
 
-  def insert_feed_item_statuses(user, feed) do
-    feed_with_items = feed |> Repo.preload(:feed_items)
+  defp get_db_statuses_from_db_items(items, user_id) do
+    items
+    |> Enum.map(fn item ->
+      # Repo.insert_all doesn't support auto timestamps
+      utc_now =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.truncate(:second)
 
-    Enum.each(feed_with_items.feed_items, fn item ->
-      create_feed_item_status(item, user, %{is_read: false})
+      %{
+        user_id: user_id,
+        feed_item_id: item.id,
+        is_read: false,
+        current_time_sec: nil,
+        inserted_at: utc_now,
+        updated_at: utc_now
+      }
     end)
+  end
+
+  defp get_db_statuses_from_client_items(items, user_id) do
+    items
+    |> Enum.map(fn %{"id" => item_id} = item ->
+      # Repo.insert_all doesn't support auto timestamps
+      utc_now =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.truncate(:second)
+
+      base_status = %{
+        user_id: user_id,
+        feed_item_id: item_id,
+        is_read: item["isRead"],
+        inserted_at: utc_now,
+        updated_at: utc_now
+      }
+
+      case item["currentTime"] do
+        nil ->
+          existing_current_time =
+            get_feed_item_status(item_id, user_id)
+            |> Enum.at(0, %{})
+            |> Map.get(:current_time_sec)
+
+          Map.put(base_status, :current_time_sec, existing_current_time)
+
+        time ->
+          Map.put(base_status, :current_time_sec, time)
+      end
+    end)
+  end
+
+  defp update_item_statuses(statuses) do
+    Repo.insert_all(FeedItemStatus, statuses,
+      on_conflict: {:replace, [:is_read, :current_time_sec, :updated_at]},
+      conflict_target: [:user_id, :feed_item_id]
+    )
   end
 end

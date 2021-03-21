@@ -169,22 +169,21 @@ defmodule FeedMe.Content do
   end
 
   @doc """
-  Gets a single feed_item and it's read/unread status.
+  Gets a single feed item.
 
-  Raises `Ecto.NoResultsError` if the Feed item does not exist.
+  Raises `Ecto.NoResultsError` if the feed item does not exist.
 
   ## Examples
 
-      iex> get_feed_item!(item_id, user_id)
+      iex> get_feed_item!(item_id)
       %FeedItem{}
 
-      iex> get_feed_item!(missing_item_id, user_id)
+      iex> get_feed_item!(missing_item_id)
       ** (Ecto.NoResultsError)
 
   """
-  def get_feed_item!(id, user_id) do
+  def get_feed_item!(id) do
     Repo.get!(FeedItem, id)
-    |> Repo.preload(feed_item_statuses: from(s in FeedItemStatus, where: s.user_id == ^user_id))
   end
 
   @doc """
