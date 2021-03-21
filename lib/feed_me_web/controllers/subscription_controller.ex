@@ -93,7 +93,7 @@ defmodule FeedMeWeb.SubscriptionController do
 
     case AccountContent.create_subscription(user, feed) do
       {:ok, _subscription} ->
-        AccountContent.insert_feed_item_statuses(user, feed)
+        AccountContent.create_feed_item_statuses(user.id, feed)
 
         Conn.send_resp(
           conn,

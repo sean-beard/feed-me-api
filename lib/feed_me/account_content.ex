@@ -192,6 +192,14 @@ defmodule FeedMe.AccountContent do
     )
   end
 
+  def create_feed_item_statuses(user_id, feed) do
+    feed
+    |> Repo.preload(:feed_items)
+    |> Map.get(:feed_items, [])
+    |> get_db_statuses_from_db_items(user_id)
+    |> update_item_statuses
+  end
+
   # TODO FeedItemStatus type assertions?
   def create_or_update_feed_item_statuses(user_id, client_items) do
     get_db_statuses_from_client_items(client_items, user_id)
@@ -245,11 +253,22 @@ defmodule FeedMe.AccountContent do
     FeedItemStatus.changeset(feed_item_status, attrs)
   end
 
-  def insert_feed_item_statuses(user, feed) do
-    feed_with_items = feed |> Repo.preload(:feed_items)
+  defp get_db_statuses_from_db_items(items, user_id) do
+    items
+    |> Enum.map(fn item ->
+      # Repo.insert_all doesn't support auto timestamps
+      utc_now =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.truncate(:second)
 
-    Enum.each(feed_with_items.feed_items, fn item ->
-      create_feed_item_status(item, user, %{is_read: false})
+      %{
+        user_id: user_id,
+        feed_item_id: item.id,
+        is_read: false,
+        current_time_sec: nil,
+        inserted_at: utc_now,
+        updated_at: utc_now
+      }
     end)
   end
 
