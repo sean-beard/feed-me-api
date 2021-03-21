@@ -23,30 +23,13 @@ defmodule FeedMeWeb.FeedController do
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, item: item}))
   end
 
-  def update_item_statuses(conn, %{"items" => items}) do
-    items
-    |> Enum.each(fn %{"id" => item_id} = item ->
-      attrs =
-        case item["currentTime"] do
-          nil ->
-            %{is_read: item["isRead"]}
-
-          time ->
-            %{is_read: item["isRead"], current_time_sec: time}
-        end
-
-      create_or_update_feed_item_status(conn.assigns.user, item_id, attrs)
-    end)
+  def update_item_statuses(conn, %{"items" => client_items}) do
+    AccountContent.create_or_update_feed_item_statuses(conn.assigns.user.id, client_items)
 
     Conn.send_resp(
       conn,
       :ok,
       Jason.encode!(%{status: 200, message: "Success"})
     )
-  end
-
-  defp create_or_update_feed_item_status(user, feed_item_id, attrs) do
-    item = Content.get_feed_item!(feed_item_id)
-    AccountContent.create_feed_item_status(item, user, attrs)
   end
 end

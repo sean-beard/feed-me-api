@@ -192,6 +192,12 @@ defmodule FeedMe.AccountContent do
     )
   end
 
+  # TODO FeedItemStatus type assertions?
+  def create_or_update_feed_item_statuses(user_id, client_items) do
+    get_db_statuses_from_client_items(client_items, user_id)
+    |> update_item_statuses
+  end
+
   @doc """
   Updates a feed_item_status.
 
@@ -245,5 +251,43 @@ defmodule FeedMe.AccountContent do
     Enum.each(feed_with_items.feed_items, fn item ->
       create_feed_item_status(item, user, %{is_read: false})
     end)
+  end
+
+  defp get_db_statuses_from_client_items(items, user_id) do
+    items
+    |> Enum.map(fn %{"id" => item_id} = item ->
+      # Repo.insert_all doesn't support auto timestamps
+      utc_now =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.truncate(:second)
+
+      base_status = %{
+        user_id: user_id,
+        feed_item_id: item_id,
+        is_read: item["isRead"],
+        inserted_at: utc_now,
+        updated_at: utc_now
+      }
+
+      case item["currentTime"] do
+        nil ->
+          existing_current_time =
+            get_feed_item_status(item_id, user_id)
+            |> Enum.at(0, %{})
+            |> Map.get(:current_time_sec)
+
+          Map.put(base_status, :current_time_sec, existing_current_time)
+
+        time ->
+          Map.put(base_status, :current_time_sec, time)
+      end
+    end)
+  end
+
+  defp update_item_statuses(statuses) do
+    Repo.insert_all(FeedItemStatus, statuses,
+      on_conflict: {:replace, [:is_read, :current_time_sec, :updated_at]},
+      conflict_target: [:user_id, :feed_item_id]
+    )
   end
 end
