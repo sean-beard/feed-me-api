@@ -33,7 +33,7 @@ defmodule FeedMeWeb.FeedController do
           nil ->
             # We don't want to set `current_time_sec` to `nil` when updating only `is_read`
             AccountContent.get_feed_item_status(item_id, user_id)
-            |> Enum.at(0)
+            |> Enum.at(0, %{})
             |> Map.get(:current_time_sec)
 
           time ->
