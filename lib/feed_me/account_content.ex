@@ -165,13 +165,19 @@ defmodule FeedMe.AccountContent do
 
   """
   def get_feed_item_status(feed_item_id, user_id) do
-    # TODO: update this to Repo.one
-    Repo.all(
+    query =
       from(s in FeedItemStatus,
         where: s.feed_item_id == ^feed_item_id and s.user_id == ^user_id,
         select: s
       )
-    )
+
+    case Repo.one(query) do
+      status = %FeedItemStatus{} ->
+        status
+
+      nil ->
+        %{}
+    end
   end
 
   @doc """
@@ -320,7 +326,6 @@ defmodule FeedMe.AccountContent do
         nil ->
           existing_current_time =
             get_feed_item_status(item_id, user_id)
-            |> Enum.at(0, %{})
             |> Map.get(:current_time_sec)
 
           Map.put(base_status, :current_time_sec, existing_current_time)

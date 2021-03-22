@@ -95,8 +95,7 @@ defmodule FeedMe.AccountContentTest do
       feed_item_status = feed_item_status_fixture(user, feed_item)
 
       assert AccountContent.get_feed_item_status(feed_item_status.feed_item_id, user.id)
-             |> Repo.preload(:user) ==
-               [feed_item_status]
+             |> Repo.preload(:user) == feed_item_status
     end
 
     test "create_feed_item_status/3 with valid data creates a feed_item_status" do
@@ -137,7 +136,7 @@ defmodule FeedMe.AccountContentTest do
       assert {:error, %Ecto.Changeset{}} =
                AccountContent.update_feed_item_status(feed_item_status, @invalid_attrs)
 
-      assert [feed_item_status] ==
+      assert feed_item_status ==
                AccountContent.get_feed_item_status(feed_item_status.feed_item_id, user.id)
                |> Repo.preload(:user)
     end
@@ -148,7 +147,7 @@ defmodule FeedMe.AccountContentTest do
       feed_item_status = feed_item_status_fixture(user, feed_item)
       assert {:ok, %FeedItemStatus{}} = AccountContent.delete_feed_item_status(feed_item_status)
 
-      assert AccountContent.get_feed_item_status(feed_item_status.feed_item_id, user.id) == []
+      assert AccountContent.get_feed_item_status(feed_item_status.feed_item_id, user.id) == %{}
     end
 
     test "change_feed_item_status/1 returns a feed_item_status changeset" do
