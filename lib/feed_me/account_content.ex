@@ -151,6 +151,19 @@ defmodule FeedMe.AccountContent do
     Repo.all(FeedItemStatus)
   end
 
+  @doc """
+  Gets a feed item status given the item ID and the user ID.
+  Raises if more than one entry is found.
+
+  ## Examples
+
+      iex> get_feed_item_status(feed_item_id, user_id)
+      %FeedItemStatus{}
+
+      iex> get_feed_item_status(bad_feed_item_id, user)
+      %{}
+
+  """
   def get_feed_item_status(feed_item_id, user_id) do
     # TODO: update this to Repo.one
     Repo.all(
@@ -192,6 +205,14 @@ defmodule FeedMe.AccountContent do
     )
   end
 
+  @doc """
+  Creates new feed item statuses given a user ID and a feed.
+
+  ## Examples
+
+      iex> create_feed_item_statuses(user_id, feed_with_15_items)
+      {15, nil}
+  """
   def create_feed_item_statuses(user_id, feed) do
     feed
     |> Repo.preload(:feed_items)
@@ -200,7 +221,14 @@ defmodule FeedMe.AccountContent do
     |> update_item_statuses
   end
 
-  # TODO FeedItemStatus type assertions?
+  @doc """
+  Creates new feed item statuses given a user ID and a feed items from the client.
+
+  ## Examples
+
+      iex> create_or_update_feed_item_statuses(user_id, client_items_with_len_15)
+      {15, nil}
+  """
   def create_or_update_feed_item_statuses(user_id, client_items) do
     get_db_statuses_from_client_items(client_items, user_id)
     |> update_item_statuses
