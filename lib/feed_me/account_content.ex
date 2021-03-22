@@ -7,6 +7,7 @@ defmodule FeedMe.AccountContent do
   alias FeedMe.Repo
 
   alias FeedMe.AccountContent.Subscription
+  alias FeedMe.AccountContent.SubscriptionDto
 
   @doc """
   Returns a list of all subscriptions.
@@ -131,9 +132,11 @@ defmodule FeedMe.AccountContent do
   end
 
   def get_subscription_dto(subscription) do
-    subscription
-    |> Map.put(:isSubscribed, subscription.is_subscribed)
-    |> Map.put(:feedName, subscription.feed.name)
+    %SubscriptionDto{
+      id: subscription.id,
+      isSubscribed: subscription.is_subscribed,
+      feedName: subscription.feed.name
+    }
   end
 
   alias FeedMe.AccountContent.FeedItemStatus
