@@ -236,7 +236,7 @@ defmodule FeedMe.AccountContent do
       {15, nil}
   """
   def create_or_update_feed_item_statuses(user_id, client_items) do
-    get_db_statuses_from_client_items(client_items, user_id)
+    get_statuses_from_dtos(client_items, user_id)
     |> update_item_statuses
   end
 
@@ -306,7 +306,7 @@ defmodule FeedMe.AccountContent do
     end)
   end
 
-  defp get_db_statuses_from_client_items(items, user_id) do
+  defp get_statuses_from_dtos(items, user_id) do
     items
     |> Enum.map(fn %{"id" => item_id} = item ->
       # Repo.insert_all doesn't support auto timestamps
