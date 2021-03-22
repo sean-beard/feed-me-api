@@ -287,6 +287,15 @@ defmodule FeedMe.AccountContent do
     FeedItemStatus.changeset(feed_item_status, attrs)
   end
 
+  @doc """
+  Returns an enum of feed item statuses given feed items and a user ID.
+
+  ## Examples
+
+      iex> get_statuses_from_items(feed_items, user_id)
+      [%FeedItemStatus{}, ...]
+
+  """
   defp get_statuses_from_items(items, user_id) do
     items
     |> Enum.map(fn item ->
@@ -306,6 +315,15 @@ defmodule FeedMe.AccountContent do
     end)
   end
 
+  @doc """
+  Returns an enum of feed item statuses given client feed items and a user ID.
+
+  ## Examples
+
+      iex> get_statuses_from_items(client_feed_items, user_id)
+      [%FeedItemStatus{}, ...]
+
+  """
   defp get_statuses_from_dtos(items, user_id) do
     items
     |> Enum.map(fn %{"id" => item_id} = item ->
