@@ -15,7 +15,7 @@ defmodule FeedMeWeb.SubscriptionController do
     subs =
       AccountContent.list_subscriptions(user.id)
       |> FeedMe.Repo.preload(:feed)
-      |> Enum.map(&AccountContent.convert_subscription_to_json/1)
+      |> Enum.map(&AccountContent.get_subscription_dto/1)
 
     Conn.send_resp(
       conn,

@@ -130,7 +130,7 @@ defmodule FeedMe.AccountContent do
     Subscription.changeset(subscription, attrs)
   end
 
-  def convert_subscription_to_json(subscription) do
+  def get_subscription_dto(subscription) do
     subscription
     |> Map.put(:isSubscribed, subscription.is_subscribed)
     |> Map.put(:feedName, subscription.feed.name)
