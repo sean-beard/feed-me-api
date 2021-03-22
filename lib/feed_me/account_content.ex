@@ -223,7 +223,7 @@ defmodule FeedMe.AccountContent do
     feed
     |> Repo.preload(:feed_items)
     |> Map.get(:feed_items, [])
-    |> get_db_statuses_from_db_items(user_id)
+    |> get_statuses_from_items(user_id)
     |> update_item_statuses
   end
 
@@ -287,7 +287,7 @@ defmodule FeedMe.AccountContent do
     FeedItemStatus.changeset(feed_item_status, attrs)
   end
 
-  defp get_db_statuses_from_db_items(items, user_id) do
+  defp get_statuses_from_items(items, user_id) do
     items
     |> Enum.map(fn item ->
       # Repo.insert_all doesn't support auto timestamps
