@@ -313,13 +313,13 @@ defmodule FeedMe.Content do
 
   defp get_feed_item_status(item, user) do
     case AccountContent.get_feed_item_status(item.id, user.id) do
-      [] ->
+      status = %AccountContent.FeedItemStatus{} ->
+        status
+
+      %{} ->
         {:ok, %FeedItemStatus{} = status} =
           AccountContent.create_feed_item_status(item, user, %{is_read: false})
 
-        status
-
-      [status = %AccountContent.FeedItemStatus{}] ->
         status
     end
   end

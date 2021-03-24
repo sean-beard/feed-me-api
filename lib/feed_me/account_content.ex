@@ -7,6 +7,7 @@ defmodule FeedMe.AccountContent do
   alias FeedMe.Repo
 
   alias FeedMe.AccountContent.Subscription
+  alias FeedMe.AccountContent.SubscriptionDto
 
   @doc """
   Returns a list of all subscriptions.
@@ -130,10 +131,12 @@ defmodule FeedMe.AccountContent do
     Subscription.changeset(subscription, attrs)
   end
 
-  def convert_subscription_to_json(subscription) do
-    subscription
-    |> Map.put(:isSubscribed, subscription.is_subscribed)
-    |> Map.put(:feedName, subscription.feed.name)
+  def get_subscription_dto(subscription) do
+    %SubscriptionDto{
+      id: subscription.id,
+      isSubscribed: subscription.is_subscribed,
+      feedName: subscription.feed.name
+    }
   end
 
   alias FeedMe.AccountContent.FeedItemStatus
@@ -151,14 +154,33 @@ defmodule FeedMe.AccountContent do
     Repo.all(FeedItemStatus)
   end
 
+  @doc """
+  Gets a feed item status given the item ID and the user ID.
+  Raises if more than one entry is found.
+
+  ## Examples
+
+      iex> get_feed_item_status(feed_item_id, user_id)
+      %FeedItemStatus{}
+
+      iex> get_feed_item_status(bad_feed_item_id, user)
+      %{}
+
+  """
   def get_feed_item_status(feed_item_id, user_id) do
-    # TODO: update this to Repo.one
-    Repo.all(
+    query =
       from(s in FeedItemStatus,
         where: s.feed_item_id == ^feed_item_id and s.user_id == ^user_id,
         select: s
       )
-    )
+
+    case Repo.one(query) do
+      status = %FeedItemStatus{} ->
+        status
+
+      nil ->
+        %{}
+    end
   end
 
   @doc """
@@ -192,17 +214,32 @@ defmodule FeedMe.AccountContent do
     )
   end
 
+  @doc """
+  Creates new feed item statuses given a user ID and a feed.
+
+  ## Examples
+
+      iex> create_feed_item_statuses(user_id, feed_with_15_items)
+      {15, nil}
+  """
   def create_feed_item_statuses(user_id, feed) do
     feed
     |> Repo.preload(:feed_items)
     |> Map.get(:feed_items, [])
-    |> get_db_statuses_from_db_items(user_id)
+    |> get_statuses_from_items(user_id)
     |> update_item_statuses
   end
 
-  # TODO FeedItemStatus type assertions?
+  @doc """
+  Creates new feed item statuses given a user ID and a feed items from the client.
+
+  ## Examples
+
+      iex> create_or_update_feed_item_statuses(user_id, client_items_with_len_15)
+      {15, nil}
+  """
   def create_or_update_feed_item_statuses(user_id, client_items) do
-    get_db_statuses_from_client_items(client_items, user_id)
+    get_statuses_from_dtos(client_items, user_id)
     |> update_item_statuses
   end
 
@@ -253,7 +290,16 @@ defmodule FeedMe.AccountContent do
     FeedItemStatus.changeset(feed_item_status, attrs)
   end
 
-  defp get_db_statuses_from_db_items(items, user_id) do
+  @doc """
+  Returns an enum of feed item statuses given feed items and a user ID.
+
+  ## Examples
+
+      iex> get_statuses_from_items(feed_items, user_id)
+      [%FeedItemStatus{}, ...]
+
+  """
+  defp get_statuses_from_items(items, user_id) do
     items
     |> Enum.map(fn item ->
       # Repo.insert_all doesn't support auto timestamps
@@ -272,7 +318,16 @@ defmodule FeedMe.AccountContent do
     end)
   end
 
-  defp get_db_statuses_from_client_items(items, user_id) do
+  @doc """
+  Returns an enum of feed item statuses given client feed items and a user ID.
+
+  ## Examples
+
+      iex> get_statuses_from_items(client_feed_items, user_id)
+      [%FeedItemStatus{}, ...]
+
+  """
+  defp get_statuses_from_dtos(items, user_id) do
     items
     |> Enum.map(fn %{"id" => item_id} = item ->
       # Repo.insert_all doesn't support auto timestamps
@@ -292,7 +347,6 @@ defmodule FeedMe.AccountContent do
         nil ->
           existing_current_time =
             get_feed_item_status(item_id, user_id)
-            |> Enum.at(0, %{})
             |> Map.get(:current_time_sec)
 
           Map.put(base_status, :current_time_sec, existing_current_time)
