@@ -132,11 +132,7 @@ defmodule FeedMe.AccountContent do
   end
 
   def get_subscription_dto(subscription) do
-    %SubscriptionDto{
-      id: subscription.id,
-      isSubscribed: subscription.is_subscribed,
-      feedName: subscription.feed.name
-    }
+    %SubscriptionDto{id: subscription.id, feedName: subscription.feed.name}
   end
 
   alias FeedMe.AccountContent.FeedItemStatus
