@@ -7,7 +7,7 @@ defmodule FeedMeWeb.SubscriptionController do
   alias Plug.Conn
 
   # This plug will execute before every handler in this list
-  plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
+  plug(FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer")
 
   def index(conn, _params) do
     subscriptions = AccountContent.get_subscription_dtos(conn.assigns.user.id)
