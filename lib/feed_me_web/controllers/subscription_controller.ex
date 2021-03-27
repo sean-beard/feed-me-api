@@ -10,17 +10,12 @@ defmodule FeedMeWeb.SubscriptionController do
   plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
 
   def index(conn, _params) do
-    user = conn.assigns.user
-
-    subs =
-      AccountContent.list_subscriptions(user.id)
-      |> FeedMe.Repo.preload(:feed)
-      |> Enum.map(&AccountContent.get_subscription_dto/1)
+    subscriptions = AccountContent.get_subscription_dtos(conn.assigns.user.id)
 
     Conn.send_resp(
       conn,
       :ok,
-      Jason.encode!(%{status: 200, subscriptions: subs})
+      Jason.encode!(%{status: 200, subscriptions: subscriptions})
     )
   end
 

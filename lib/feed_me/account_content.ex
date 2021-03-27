@@ -131,8 +131,32 @@ defmodule FeedMe.AccountContent do
     Subscription.changeset(subscription, attrs)
   end
 
-  def get_subscription_dto(subscription) do
-    %SubscriptionDto{id: subscription.id, feedName: subscription.feed.name}
+  @doc """
+  Get all subscription data transfer objects given a user ID.
+
+  ## Examples
+
+      iex> get_subscription_dtos(user_id)
+      [%SubscriptionDto{}, ...]
+
+  """
+  def get_subscription_dtos(user_id) do
+    list_subscriptions(user_id)
+    |> Enum.map(&get_subscription_dto/1)
+  end
+
+  @doc """
+  Gets a subscription data transfer object given a subscription.
+
+  ## Examples
+
+      iex> change_subscription(subscription)
+      %SubscriptionDto{}
+
+  """
+  defp get_subscription_dto(subscription) do
+    sub_with_feed = Repo.preload(subscription, :feed)
+    %SubscriptionDto{id: sub_with_feed.id, feedName: sub_with_feed.feed.name}
   end
 
   alias FeedMe.AccountContent.FeedItemStatus
