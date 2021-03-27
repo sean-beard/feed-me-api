@@ -7,20 +7,15 @@ defmodule FeedMeWeb.SubscriptionController do
   alias Plug.Conn
 
   # This plug will execute before every handler in this list
-  plug FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer"
+  plug(FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer")
 
   def index(conn, _params) do
-    user = conn.assigns.user
-
-    subs =
-      AccountContent.list_subscriptions(user.id)
-      |> FeedMe.Repo.preload(:feed)
-      |> Enum.map(&AccountContent.get_subscription_dto/1)
+    subscriptions = AccountContent.get_subscription_dtos(conn.assigns.user.id)
 
     Conn.send_resp(
       conn,
       :ok,
-      Jason.encode!(%{status: 200, subscriptions: subs})
+      Jason.encode!(%{status: 200, subscriptions: subscriptions})
     )
   end
 
@@ -30,7 +25,7 @@ defmodule FeedMeWeb.SubscriptionController do
         Conn.send_resp(
           conn,
           :unsupported_media_type,
-          "Unsupported RSS feed format."
+          Jason.encode!(%{status: 415, message: "Unsupported RSS feed format."})
         )
 
       feed ->
@@ -54,7 +49,12 @@ defmodule FeedMeWeb.SubscriptionController do
           update_or_create_subscription(conn, Content.get_feed_by_url!(url))
         else
           IO.puts("Error creating new feed from url: #{url}")
-          Conn.send_resp(conn, :internal_server_error, "Error creating feed")
+
+          Conn.send_resp(
+            conn,
+            :internal_server_error,
+            Jason.encode!(%{status: 500, message: "Error creating feed"})
+          )
         end
     end
   end
@@ -83,7 +83,7 @@ defmodule FeedMeWeb.SubscriptionController do
         Conn.send_resp(
           conn,
           :internal_server_error,
-          "Error updating subscription #{subscription.id}"
+          Jason.encode!(%{status: 500, message: "Error updating subscription #{subscription.id}"})
         )
     end
   end
@@ -109,7 +109,12 @@ defmodule FeedMeWeb.SubscriptionController do
           Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, message: "Already subscribed"}))
         else
           IO.puts("Error creating new subscription for feed #{feed.id}")
-          Conn.send_resp(conn, :internal_server_error, "Error creating subscription")
+
+          Conn.send_resp(
+            conn,
+            :internal_server_error,
+            Jason.encode!(%{status: 500, message: "Error creating subscription"})
+          )
         end
     end
   end
