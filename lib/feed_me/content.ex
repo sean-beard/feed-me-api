@@ -12,6 +12,18 @@ defmodule FeedMe.Content do
   alias FeedMe.Repo
   alias FeedMe.RssUtils
 
+  @doc """
+  Gets a news feed given a user ID.
+
+  ## Examples
+
+      iex> list_feed(user_id)
+      [%FeedItemDto{}, ...]
+
+      iex> list_feed(invalid_user_id)
+      []
+
+  """
   def list_feed(user_id) do
     query = """
       select
@@ -251,11 +263,32 @@ defmodule FeedMe.Content do
     FeedItem.changeset(feed_item, attrs)
   end
 
+  @doc """
+  Inserts all feed items of a given feed.
+
+  Returns a tuple containing the number of entries and any returned result as second element.
+  The second element will be `nil` if no result is returned.
+
+  ## Examples
+
+      iex> insert_all_feed_items(feed)
+      [100, nil]
+
+  """
   def insert_all_feed_items(feed) do
     feed_items = RssUtils.get_feed_items_from_rss_url(feed.url, feed.id)
     Repo.insert_all(FeedItem, feed_items, on_conflict: :nothing)
   end
 
+  @doc """
+  Gets a feed item data transfer object given the feed item and the user.
+
+  ## Examples
+
+      iex> get_feed_item_dto(item, user)
+      %FeedItemDto{}
+
+  """
   def get_feed_item_dto(item, user) do
     status = get_feed_item_status(item, user)
 
