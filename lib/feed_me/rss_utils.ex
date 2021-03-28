@@ -6,6 +6,20 @@ defmodule FeedMe.RssUtils do
   alias FeedMe.YouTubeUtils
   alias HTTPoison.Response
 
+  @doc """
+  Gets an RSS URL.
+
+  ## Examples
+
+      iex> get_rss_url("https://my.rss.feed.com/feed.xml")
+      "https://my.rss.feed.com/feed.xml"
+
+      iex> get_rss_url("https://www.youtube.com/channel/UCkQX1tChV7Z7l1LFF4L9j_g")
+      "https://www.youtube.com/feeds/videos.xml?channel_id=UCkQX1tChV7Z7l1LFF4L9j_g"
+
+      iex> get_rss_url("https://www.youtube.com/c/StrangeLoopConf")
+      "https://www.youtube.com/feeds/videos.xml?channel_id=UC_QIfHvN9auy2CoOdSfMWDw"
+  """
   def get_rss_url(url_input) do
     if YouTubeUtils.is_youtube_url(url_input) &&
          YouTubeUtils.is_youtube_rss_url(url_input) == false do
@@ -19,6 +33,19 @@ defmodule FeedMe.RssUtils do
     end
   end
 
+  @doc """
+  Gets the feed for a given RSS URL.
+
+  Returns `nil` if a feed can't be returned.
+
+  ## Examples
+
+      iex> get_feed_from_rss_url("https://my.rss.feed.com/feed.xml")
+      %Feed{}
+
+      iex> get_feed_from_rss_url("https://google.com")
+      nil
+  """
   def get_feed_from_rss_url(url_input) do
     url = get_rss_url(url_input)
 
@@ -31,6 +58,14 @@ defmodule FeedMe.RssUtils do
     end
   end
 
+  @doc """
+  Gets feed items for a given RSS URL.
+
+  ## Examples
+
+      iex> get_feed_items_from_rss_url("https://my.rss.feed.com/feed.xml")
+      [%FeedItem{}, ...]
+  """
   def get_feed_items_from_rss_url(url, feed_id) do
     get_rss_items_from_rss_url(url)
     |> convert_rss_items_to_db_items(feed_id)
