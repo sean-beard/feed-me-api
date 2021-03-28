@@ -3,6 +3,7 @@ defmodule FeedMe.RssUtils do
   This module is a utilty to process RSS feeds.
   """
 
+  alias FeedMe.Content.FeedItem
   alias FeedMe.YouTubeUtils
   alias HTTPoison.Response
 
@@ -159,7 +160,7 @@ defmodule FeedMe.RssUtils do
           "-url" => media_url
         }
       } ->
-        %{
+        %FeedItem{
           title: title,
           description: :erlang.term_to_binary(description, [:compressed]),
           url: url,
@@ -178,7 +179,7 @@ defmodule FeedMe.RssUtils do
           "-url" => media_url
         }
       } ->
-        %{
+        %FeedItem{
           title: title,
           description: :erlang.term_to_binary(description, [:compressed]),
           url: media_url,
@@ -194,7 +195,7 @@ defmodule FeedMe.RssUtils do
         "link" => url,
         "pubDate" => pub_date
       } ->
-        %{
+        %FeedItem{
           title: title,
           description: :erlang.term_to_binary(description, [:compressed]),
           url: url,
@@ -210,7 +211,7 @@ defmodule FeedMe.RssUtils do
           "-href" => url
         }
       } ->
-        %{
+        %FeedItem{
           title: title,
           description: :erlang.term_to_binary(description, [:compressed]),
           url: url,
