@@ -6,6 +6,7 @@ defmodule FeedMeWeb.AuthController do
   use FeedMeWeb, :controller
   plug(Ueberauth)
 
+  alias FeedMe.Account
   alias FeedMe.Account.User
   alias FeedMe.Repo
 
@@ -39,7 +40,7 @@ defmodule FeedMeWeb.AuthController do
   end
 
   defp sign_in(conn, changeset) do
-    case insert_or_update_user(changeset) do
+    case Account.insert_or_update_user(changeset) do
       {:ok, user} ->
         conn
         |> put_session(:user_id, user.id)
