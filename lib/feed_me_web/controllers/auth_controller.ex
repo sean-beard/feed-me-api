@@ -6,6 +6,7 @@ defmodule FeedMeWeb.AuthController do
   use FeedMeWeb, :controller
   plug(Ueberauth)
 
+  alias FeedMe.Account
   alias FeedMe.Account.User
   alias FeedMe.Repo
 
@@ -39,7 +40,7 @@ defmodule FeedMeWeb.AuthController do
   end
 
   defp sign_in(conn, changeset) do
-    case insert_or_update_user(changeset) do
+    case Account.insert_or_update_user(changeset) do
       {:ok, user} ->
         conn
         |> put_session(:user_id, user.id)
@@ -62,16 +63,6 @@ defmodule FeedMeWeb.AuthController do
           :internal_server_error,
           Jason.encode!(%{status: 500, message: "Error signing in."})
         )
-    end
-  end
-
-  defp insert_or_update_user(changeset) do
-    case Repo.get_by(User, email: changeset.changes.email) do
-      nil ->
-        Repo.insert(changeset)
-
-      user ->
-        {:ok, user}
     end
   end
 end
