@@ -36,6 +36,21 @@ defmodule FeedMe.Account do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
+
+  @doc """
+  Gets a single user given an access token.
+
+  Returns `nil` if the User does not exist.
+
+  ## Examples
+
+      iex> get_user_by_token(token)
+      %User{}
+
+      iex> get_user_by_token(invalid_token)
+      nil
+
+  """
   def get_user_by_token(token), do: Repo.get_by(User, token: token)
 
   @doc """
