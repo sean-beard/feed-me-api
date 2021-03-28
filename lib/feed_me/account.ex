@@ -117,4 +117,14 @@ defmodule FeedMe.Account do
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end
+
+  def insert_or_update_user(changeset) do
+    case Repo.get_by(User, email: changeset.changes.email) do
+      nil ->
+        Repo.insert(changeset)
+
+      user ->
+        {:ok, user}
+    end
+  end
 end
