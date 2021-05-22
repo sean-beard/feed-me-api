@@ -119,12 +119,14 @@ defmodule FeedMeWeb.SubscriptionController do
     end
   end
 
+  # subscription
   defp get_constraint_type(
          user_id: {_message, [constraint: constraint_type, constraint_name: _name]}
        ) do
     constraint_type
   end
 
+  # feed
   defp get_constraint_type(
          email: {_message, [constraint: constraint_type, constraint_name: _name]}
        ) do
