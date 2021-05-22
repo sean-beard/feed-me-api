@@ -44,7 +44,7 @@ defmodule FeedMeWeb.SubscriptionController do
         update_or_create_subscription(conn, feed)
 
       {:error, feed_changeset} ->
-        if get_feed_constraint_type(feed_changeset.errors) == :unique do
+        if get_constraint_type(feed_changeset.errors) == :unique do
           IO.puts("Feed already exists. Creating subscription...")
           update_or_create_subscription(conn, Content.get_feed_by_url!(url))
         else
@@ -102,7 +102,7 @@ defmodule FeedMeWeb.SubscriptionController do
         )
 
       {:error, subscription_changeset} ->
-        constraint_type = get_subscription_constraint_type(subscription_changeset.errors)
+        constraint_type = get_constraint_type(subscription_changeset.errors)
 
         if constraint_type == :unique do
           IO.puts("Subscription already exists.")
@@ -119,13 +119,19 @@ defmodule FeedMeWeb.SubscriptionController do
     end
   end
 
-  defp get_subscription_constraint_type(errors) do
-    [user_id: {_message, [constraint: constraint_type, constraint_name: _name]}] = errors
+  defp get_constraint_type(
+         user_id: {_message, [constraint: constraint_type, constraint_name: _name]}
+       ) do
     constraint_type
   end
 
-  defp get_feed_constraint_type(errors) do
-    [email: {_message, [constraint: constraint_type, constraint_name: _name]}] = errors
+  defp get_constraint_type(
+         email: {_message, [constraint: constraint_type, constraint_name: _name]}
+       ) do
     constraint_type
+  end
+
+  defp get_constraint_type(_other_error) do
+    ""
   end
 end
