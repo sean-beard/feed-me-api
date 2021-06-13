@@ -74,6 +74,10 @@ defmodule FeedMe.RssUtils do
   defp fetch_feed_from_rss_url(url) do
     %Response{body: body} = HTTPoison.get!(url)
 
+    IO.puts("+++++++++++++++++++++++++++")
+    IO.inspect(XmlToMap.naive_map(body))
+    IO.puts("+++++++++++++++++++++++++++")
+
     case XmlToMap.naive_map(body) do
       %{
         "rss" => %{
