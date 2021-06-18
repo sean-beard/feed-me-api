@@ -75,7 +75,7 @@ $ mix phx.server
 
 This project uses [CircleCI](https://circleci.com/) for continuous integration. Source code must be verified, built and successfully tested before it can be merged.
 
-[Credo](https://github.com/rrrene/credo) is used for static code analysis. [Mix](https://hexdocs.pm/mix/master/Mix.html) is used for code formatting.
+[Credo](https://github.com/rrrene/credo) is used for static code analysis. [Mix](https://hexdocs.pm/mix/master/Mix.html) formatting capabilites are used for code formatting.
 
 ### Deployment
 
