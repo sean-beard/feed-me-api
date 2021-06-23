@@ -272,7 +272,7 @@ defmodule FeedMe.Content do
   ## Examples
 
       iex> insert_all_feed_items(feed)
-      [100, nil]
+      {100, nil}
 
   """
   def insert_all_feed_items(feed) do
@@ -303,6 +303,39 @@ defmodule FeedMe.Content do
       mediaUrl: item.media_url,
       pubDate: item.pub_date
     }
+  end
+
+  @doc """
+  Inserts all new feed items for given list of feeds.
+
+  Returns a tuple containing the number of entries and any returned result as second element.
+  The second element will be `nil` if no result is returned.
+
+  ## Examples
+
+      iex> store_new_feed_items(feed)
+      [100, nil]
+
+  """
+  def store_new_feed_items do
+    items =
+      get_feeds_with_subs()
+      |> get_items_to_store()
+
+    Repo.insert_all(FeedItem, items, on_conflict: :nothing)
+  end
+
+  defp get_feeds_with_subs do
+    AccountContent.list_subscriptions()
+    |> Enum.uniq_by(fn sub -> sub.feed_id end)
+    |> Repo.preload(:feed)
+    |> Enum.map(fn sub -> sub.feed end)
+  end
+
+  defp get_items_to_store(feeds) do
+    Enum.flat_map(feeds, fn x ->
+      RssUtils.get_feed_items_from_rss_url(x.url, x.id)
+    end)
   end
 
   defp get_feed_item_dto(item_db_result) do
