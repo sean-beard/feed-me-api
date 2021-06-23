@@ -15,14 +15,11 @@ defmodule FeedMe.AccountContent.FeedItemStorage do
 
     IO.puts("Inserting new feed items...")
 
-    # TODO: don't use this hack
-    first_section = Enum.slice(feeds_with_subs, 0..10)
-    second_section = Enum.slice(feeds_with_subs, 11..20)
-    last_section = Enum.slice(feeds_with_subs, 21..-1)
-
-    first_section |> Enum.each(&Content.insert_all_feed_items/1)
-    second_section |> Enum.each(&Content.insert_all_feed_items/1)
-    last_section |> Enum.each(&Content.insert_all_feed_items/1)
+    feeds_with_subs
+    |> Enum.chunk_every(10)
+    |> Enum.each(fn x ->
+      Enum.each(x, &Content.insert_all_feed_items/1)
+    end)
 
     IO.puts("Done storing new feed items...")
     log_current_time_utc()
