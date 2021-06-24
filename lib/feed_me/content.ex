@@ -314,13 +314,15 @@ defmodule FeedMe.Content do
   ## Examples
 
       iex> store_new_feed_items(feed)
-      [100, nil]
+      {100, nil}
 
   """
   def store_new_feed_items do
-    items =
-      get_feeds_with_subs()
-      |> get_items_to_store()
+    feeds = get_feeds_with_subs()
+    IO.puts("Found #{Enum.count(feeds)} feeds with subscriptions...")
+
+    items = get_items_to_store(feeds)
+    IO.puts("Found #{Enum.count(items)} potential items to store...")
 
     Repo.insert_all(FeedItem, items, on_conflict: :nothing)
   end
