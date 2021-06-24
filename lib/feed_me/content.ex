@@ -329,6 +329,7 @@ defmodule FeedMe.Content do
 
   defp get_feeds_with_subs do
     AccountContent.list_subscriptions()
+    |> Enum.filter(fn sub -> sub.is_subscribed end)
     |> Enum.uniq_by(fn sub -> sub.feed_id end)
     |> Repo.preload(:feed)
     |> Enum.map(fn sub -> sub.feed end)
