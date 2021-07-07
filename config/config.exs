@@ -33,8 +33,8 @@ config :ueberauth, Ueberauth,
 
 config :feed_me, FeedMe.Scheduler,
   jobs: [
-    # At midnight every night
-    {"@daily", {FeedMe.AccountContent.FeedItemStorage, :store, []}}
+    # Every 2 hours
+    {"0 */2 * * *", {FeedMe.AccountContent.FeedItemStorage, :store, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom
