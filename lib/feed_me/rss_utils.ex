@@ -135,6 +135,10 @@ defmodule FeedMe.RssUtils do
       _ ->
         []
     end
+  rescue
+    _any_error -> []
+  catch
+    _any_value -> []
   end
 
   defp convert_rss_items_to_db_items(items, feed_id) do

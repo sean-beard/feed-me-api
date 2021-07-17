@@ -64,11 +64,11 @@ defmodule FeedMe.RssUtilsTest do
       assert Enum.count(items) == 4
     end
 
-    test "get_feed_items_from_rss_url/2 with unsupported rss url throws error" do
+    test "get_feed_items_from_rss_url/2 with unsupported rss url returns empty array" do
       feed_id = 1
       url = "https://google.com"
 
-      assert catch_throw(RssUtils.get_feed_items_from_rss_url(url, feed_id))
+      assert RssUtils.get_feed_items_from_rss_url(url, feed_id) == []
     end
   end
 end
