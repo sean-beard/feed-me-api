@@ -8,7 +8,6 @@ defmodule FeedMeWeb.AuthController do
 
   alias FeedMe.Account
   alias FeedMe.Account.User
-  alias FeedMe.Repo
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     changeset =
