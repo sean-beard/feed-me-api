@@ -17,8 +17,8 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "sh .devcontainer/entrypoint.sh"
-
+  "postCreateCommand": "sh .devcontainer/entrypoint.sh",
+  "postAttachCommand": "service postgresql start && mix phx.server"
   // Uncomment to connect as a user other than `root`. More info: https://aka.ms/vscode-remote/containers/non-root.
   // "remoteUser": "vscode"
 }

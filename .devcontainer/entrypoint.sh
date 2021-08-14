@@ -12,6 +12,3 @@ mix ecto.create
 
 echo "Running the database migrations..."
 mix ecto.migrate
-
-echo "Starting the server..."
-mix phx.server
