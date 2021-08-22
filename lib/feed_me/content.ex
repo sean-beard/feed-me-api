@@ -306,25 +306,30 @@ defmodule FeedMe.Content do
   end
 
   @doc """
-  Inserts all new feed items for given list of feeds.
+  Inserts all new feed items for all feeds.
 
-  Returns a tuple containing the number of entries and any returned result as second element.
-  The second element will be `nil` if no result is returned.
+  Returns a the result of the async stream used to perform the item storage work.
 
   ## Examples
 
-      iex> store_new_feed_items(feed)
-      {100, nil}
+      iex> store_new_feed_items()
+      [ok: {0, nil}, ok: {0, nil}, ok: {0, nil}]
 
   """
   def store_new_feed_items do
     feeds = get_feeds_with_subs()
     IO.puts("Found #{Enum.count(feeds)} feeds with subscriptions...")
 
-    items = get_items_to_store(feeds)
-    IO.puts("Found #{Enum.count(items)} potential items to store...")
-
-    Repo.insert_all(FeedItem, items, on_conflict: :nothing)
+    feeds
+    |> Task.async_stream(
+      fn feed ->
+        items = RssUtils.get_feed_items_from_rss_url(feed.url, feed.id)
+        Repo.insert_all(FeedItem, items, on_conflict: :nothing)
+      end,
+      max_concurrency: 4,
+      timeout: 10_000
+    )
+    |> Enum.to_list()
   end
 
   defp get_feeds_with_subs do
@@ -333,12 +338,6 @@ defmodule FeedMe.Content do
     |> Enum.uniq_by(fn sub -> sub.feed_id end)
     |> Repo.preload(:feed)
     |> Enum.map(fn sub -> sub.feed end)
-  end
-
-  defp get_items_to_store(feeds) do
-    Enum.flat_map(feeds, fn x ->
-      RssUtils.get_feed_items_from_rss_url(x.url, x.id)
-    end)
   end
 
   defp get_feed_item_dto(item_db_result) do
