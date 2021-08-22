@@ -10,9 +10,9 @@ defmodule FeedMe.AccountContent.FeedItemStorage do
     IO.puts("Starting job to store new feed items...")
     IO.puts("Inserting new feed items...")
 
-    {num_entries, _result} = Content.store_new_feed_items()
+    Content.store_new_feed_items()
 
-    IO.puts("Done storing #{num_entries} new feed items...")
+    IO.puts("Done storing new feed items...")
     log_current_time_utc()
   end
 
