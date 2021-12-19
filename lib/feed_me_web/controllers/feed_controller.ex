@@ -8,6 +8,13 @@ defmodule FeedMeWeb.FeedController do
   # This plug will execute before every handler in this list
   plug(FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer")
 
+  def index(conn, %{"numItems" => num_items}) do
+    num_items_integer = String.to_integer(num_items)
+    feed = conn.assigns.user.id |> Content.list_feed() |> Enum.take(num_items_integer)
+
+    Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feed: feed}))
+  end
+
   def index(conn, _params) do
     feed = Content.list_feed(conn.assigns.user.id)
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feed: feed}))
