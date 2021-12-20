@@ -10,7 +10,12 @@ defmodule FeedMeWeb.FeedController do
 
   def index(conn, %{"numItems" => num_items}) do
     num_items_integer = String.to_integer(num_items)
-    feed = conn.assigns.user.id |> Content.list_feed() |> Enum.take(num_items_integer)
+
+    feed =
+      conn.assigns.user.id
+      |> Content.list_feed()
+      |> Enum.filter(fn item -> !item.isRead end)
+      |> Enum.take(num_items_integer)
 
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feed: feed}))
   end
