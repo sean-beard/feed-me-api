@@ -63,6 +63,31 @@ defmodule FeedMe.Content do
   end
 
   @doc """
+  Gets a filtered news feed given a user ID and number of items. Unread items take precedence.
+
+  ## Examples
+
+      iex> list_filtered_feed(user_id, num_items)
+      [%FeedItemDto{}, ...]
+
+      iex> list_filtered_feed(invalid_user_id, num_items)
+      []
+
+  """
+  def list_filtered_feed(user_id, num_items) do
+    feed = list_feed(user_id)
+    filtered_feed = Enum.filter(feed, fn item -> !item.isRead end)
+
+    case filtered_feed do
+      [_at_least_one_item] ->
+        Enum.take(filtered_feed, num_items)
+
+      _ ->
+        Enum.take(feed, num_items)
+    end
+  end
+
+  @doc """
   Gets a single feed.
 
   Raises `Ecto.NoResultsError` if the Feed does not exist.
