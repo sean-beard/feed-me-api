@@ -6,7 +6,7 @@ RSS feed reader API allowing users to curate a truly personalized newsfeed.
 
 Users authenticate via GitHub and can subscribe to RSS feeds. If a feed doesn't exist in the database (i.e. no other user has subscribed to the feed before) a new feed record will be stored.
 
-Aditionally, available feed items will be stored. There is a job scheduled every two hours which will fetch and store new feed items.
+Aditionally, available feed items will be stored. There is a job scheduled every two hours which will fetch and store all new feed items.
 
 ## Endpoints
 
