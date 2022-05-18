@@ -5,7 +5,7 @@
 # is restricted to this project.
 
 # General application configuration
-use Mix.Config
+import Config
 
 config :feed_me,
   ecto_repos: [FeedMe.Repo]
@@ -39,4 +39,4 @@ config :feed_me, FeedMe.Scheduler,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env()}.exs"
+import_config "#{config_env()}.exs"

@@ -46,7 +46,7 @@ defmodule FeedMe.MixProject do
       {:phoenix_ecto, "~> 4.1"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix, "~> 1.5.3"},
+      {:phoenix, "~> 1.6.8"},
       {:plug_cowboy, "~> 2.0"},
       {:poison, "~> 4.0"},
       {:postgrex, ">= 0.0.0"},

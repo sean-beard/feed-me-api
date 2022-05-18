@@ -79,4 +79,8 @@ This project uses Github actions for continuous integration. Source code must be
 
 ### Deployment
 
-This project uses [Gigalixir](https://www.gigalixir.com/) for deployment. As of now, the API is manually deployed via [the Gigalixir CLI](https://gigalixir.readthedocs.io/en/latest/cli.html).
+This project uses [Fly.io](https://fly.io/) for deployment. As of now, the API is manually deployed via [the Fly CLI](https://fly.io/docs/getting-started/installing-flyctl).
+
+```bash
+$ fly deploy --remote-only
+```
