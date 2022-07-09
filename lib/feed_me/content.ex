@@ -49,7 +49,7 @@ defmodule FeedMe.Content do
         select s.feed_id from subscriptions as s
         where user_id = #{user_id} and is_subscribed = true
       )
-      order by pub_date desc
+      order by pub_date desc, s.is_read asc
     """
 
     case Repo.query(query) do
