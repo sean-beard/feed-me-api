@@ -105,6 +105,20 @@ defmodule FeedMe.RssUtils do
           description: description
         }
 
+      %{
+        "feed" => %{
+          "title" => %{
+            "#content" => name
+          },
+          "subtitle" => description
+        }
+      } ->
+        %{
+          name: name,
+          url: url,
+          description: description
+        }
+
       _ ->
         nil
     end
@@ -197,6 +211,26 @@ defmodule FeedMe.RssUtils do
         "description" => description,
         "link" => url,
         "pubDate" => pub_date
+      } ->
+        %{
+          title: title,
+          description: :erlang.term_to_binary(description, [:compressed]),
+          url: url,
+          pub_date: pub_date,
+          feed_id: feed_id
+        }
+
+      %{
+        "title" => %{
+          "#content" => title
+        },
+        "summary" => %{
+          "#content" => description
+        },
+        "published" => pub_date,
+        "link" => %{
+          "-href" => url
+        }
       } ->
         %{
           title: title,
