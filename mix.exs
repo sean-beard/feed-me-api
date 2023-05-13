@@ -5,9 +5,9 @@ defmodule FeedMe.MixProject do
     [
       app: :feed_me,
       version: "0.1.0",
-      elixir: "~> 1.10",
+      elixir: "~> 1.14.4",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
@@ -48,11 +48,13 @@ defmodule FeedMe.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix, "~> 1.5.3"},
       {:plug_cowboy, "~> 2.0"},
+      {:poison, "~> 4.0"},
       {:postgrex, ">= 0.0.0"},
       {:quantum, "~> 3.0"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
-      {:ueberauth_github, "~> 0.7"},
+      {:ueberauth, "~> 0.6.3"},
+      {:ueberauth_github, "~> 0.7.0"},
 
       # Development/Test
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},

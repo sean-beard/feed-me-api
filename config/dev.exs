@@ -5,7 +5,7 @@ config :feed_me, FeedMe.Repo,
   username: "postgres",
   password: "postgres",
   database: "feed_me_dev",
-  hostname: "localhost",
+  hostname: System.get_env("DB_HOSTNAME") || "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
@@ -98,5 +98,5 @@ defmodule DotEnv do
 end
 
 config :ueberauth, Ueberauth.Strategy.Github.OAuth,
-  client_id: DotEnv.get_env("GITHUB_CLIENT_ID"),
-  client_secret: DotEnv.get_env("GITHUB_CLIENT_SECRET")
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
