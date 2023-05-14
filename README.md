@@ -36,9 +36,9 @@ To close the dev container:
 
 Otherwise, make sure to have Elixir, Erlang and Postgres installed on your machine. This application was developed with:
 
-- Elixir v1.10.4
-- Erlang v23.1
-- Postgres v12.2 (needs to be v9.5 or higher)
+- Elixir v1.14.4
+- Erlang v25.3.2
+- Postgres v13 (needs to be v9.5 or higher)
 
 You can run `mix docs` to generate the documentation for this project.
 
@@ -73,7 +73,7 @@ $ mix phx.server
 
 ### Continuous Integration
 
-This project uses [CircleCI](https://circleci.com/) for continuous integration. Source code must be verified, built and successfully tested before it can be merged.
+This project uses Github actions for continuous integration. Source code must be verified, built and successfully tested before it can be merged.
 
 [Credo](https://github.com/rrrene/credo) is used for static code analysis. [Mix](https://hexdocs.pm/mix/master/Mix.html) formatting capabilites are used for code formatting.
 

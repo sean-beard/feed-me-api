@@ -1,14 +1,16 @@
 #!/bin/bash
 
 echo "Installing dependencies..."
+rm mix.lock
 mix deps.get
 
-echo "Setting up database runtime dependencies..."
-service postgresql start 
-sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';" 
+echo "Compiling..."
+mix compile
 
 echo "Creating the database..."
 mix ecto.create
 
 echo "Running the database migrations..."
 mix ecto.migrate
+
+mix phx.server
