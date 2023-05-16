@@ -58,7 +58,6 @@ RUN mix compile
 
 COPY rel rel
 
-RUN mix ecto.migrate
 COPY entrypoint.sh .
 CMD ["sh", "/app/entrypoint.sh"]
 
