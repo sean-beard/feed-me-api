@@ -55,6 +55,7 @@ defmodule FeedMe.MixProject do
       {:telemetry_poller, "~> 0.4"},
       {:ueberauth, "~> 0.6.3"},
       {:ueberauth_github, "~> 0.7.0"},
+      {:web_push_encryption, "~> 0.3"},
 
       # Development/Test
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},

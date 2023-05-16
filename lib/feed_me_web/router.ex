@@ -41,6 +41,12 @@ defmodule FeedMeWeb.Router do
 
     get "/item/:id", FeedController, :get_item
     options "/item/:id", FeedController, :nothing
+
+    get "/vapid-public-key", NotificationController, :get_vapid_public_key
+    options "/vapid-public-key", NotificationController, :nothing
+
+    post "/notification", NotificationController, :save_notification_subscription
+    options "/notification", NotificationController, :nothing
   end
 
   # Other scopes may use custom stacks.

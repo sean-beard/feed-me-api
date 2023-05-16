@@ -313,23 +313,53 @@ defmodule FeedMe.Content do
   ## Examples
 
       iex> store_new_feed_items()
-      [ok: {0, nil}, ok: {0, nil}, ok: {0, nil}]
+      [ok: 5, ok: 0, ok: 2]
 
   """
   def store_new_feed_items do
     feeds = get_feeds_with_subs()
     IO.puts("Found #{Enum.count(feeds)} feeds with subscriptions...")
 
-    feeds
-    |> Task.async_stream(
-      fn feed ->
-        items = RssUtils.get_feed_items_from_rss_url(feed.url, feed.id)
-        Repo.insert_all(FeedItem, items, on_conflict: :nothing)
-      end,
-      max_concurrency: 4,
-      timeout: 10_000
-    )
-    |> Enum.to_list()
+    response =
+      feeds
+      |> Task.async_stream(
+        fn feed ->
+          items = RssUtils.get_feed_items_from_rss_url(feed.url, feed.id)
+          {num_items_added, nil} = Repo.insert_all(FeedItem, items, on_conflict: :nothing)
+
+          get_subscriber_ids(feed.id)
+          |> Enum.map(fn user_id -> AccountContent.create_feed_item_statuses(user_id, feed) end)
+
+          num_items_added
+        end,
+        max_concurrency: 4,
+        timeout: 10_000
+      )
+      |> Enum.to_list()
+
+    response
+  end
+
+  defp get_subscriber_ids(feed_id) do
+    query = """
+      SELECT
+        user_id
+      FROM
+        subscriptions
+      WHERE
+        feed_id = #{feed_id}
+    """
+
+    case Repo.query(query) do
+      {:ok, result = %Postgrex.Result{}} ->
+        IO.puts("Found #{result.num_rows} users subscribed to feed #{feed_id}...")
+
+        result.rows
+        |> Enum.map(fn [user_id] -> user_id end)
+
+      _error ->
+        []
+    end
   end
 
   defp get_feeds_with_subs do
