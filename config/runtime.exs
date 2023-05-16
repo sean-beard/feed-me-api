@@ -4,11 +4,6 @@
 # remember to add this file to your .gitignore.
 import Config
 
-config :web_push_encryption, :vapid_details,
-  subject: "https://github.com/sean-beard/feed-me-astro/",
-  public_key: System.get_env("VAPID_PUBLIC_KEY"),
-  private_key: System.get_env("VAPID_PRIVATE_KEY")
-
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

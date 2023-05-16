@@ -71,7 +71,6 @@ defmodule FeedMe.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      start: ["docker-compose pull", "docker-compose build", "docker-compose up"],
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
