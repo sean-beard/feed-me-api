@@ -18,13 +18,15 @@ defmodule FeedMe.AccountContent.FeedItemStorage do
 
     end_unread_item_counts = Notification.get_unread_item_count_by_user()
 
-    Notification.get_new_unread_item_count_by_user(
-      start_unread_item_counts,
-      end_unread_item_counts
-    )
-    |> Enum.map(fn %{user_id: user_id, num_unread_items: num_unread_items} ->
+    new_unread_item_count_by_user =
+      Notification.get_new_unread_item_count_by_user(
+        start_unread_item_counts,
+        end_unread_item_counts
+      )
+
+    for %{user_id: user_id, num_unread_items: num_unread_items} <- new_unread_item_count_by_user do
       Notification.send_notifications(%{user_id: user_id, num_unread_items: num_unread_items})
-    end)
+    end
 
     log_current_time_utc()
   end

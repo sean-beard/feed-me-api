@@ -327,8 +327,9 @@ defmodule FeedMe.Content do
           items = RssUtils.get_feed_items_from_rss_url(feed.url, feed.id)
           {num_items_added, nil} = Repo.insert_all(FeedItem, items, on_conflict: :nothing)
 
-          get_subscriber_ids(feed.id)
-          |> Enum.map(fn user_id -> AccountContent.create_feed_item_statuses(user_id, feed) end)
+          for user_id <- get_subscriber_ids(feed.id) do
+            AccountContent.create_feed_item_statuses(user_id, feed)
+          end
 
           num_items_added
         end,

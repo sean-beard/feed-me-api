@@ -6,7 +6,7 @@ defmodule FeedMe.Release do
   @app :feed_me
 
   def migrate do
-    Application.ensure_all_started(@app)
+    load_app()
 
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
@@ -14,7 +14,7 @@ defmodule FeedMe.Release do
   end
 
   def rollback(repo, version) do
-    Application.ensure_all_started(@app)
+    load_app()
 
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
@@ -24,6 +24,6 @@ defmodule FeedMe.Release do
   end
 
   defp load_app do
-    Application.load(@app)
+    Application.ensure_all_started(@app)
   end
 end
