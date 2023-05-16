@@ -21,8 +21,9 @@ defmodule FeedMeWeb.AuthController do
     sign_in(conn, changeset)
   end
 
-  def callback(%{assigns: %{ueberauth_failure: %{errors: _errors}}} = conn, _params) do
+  def callback(%{assigns: %{ueberauth_failure: %{errors: errors}}} = conn, _params) do
     IO.puts("Error authenticating via Ueberauth...")
+    IO.inspect(errors)
 
     conn
     |> send_resp(

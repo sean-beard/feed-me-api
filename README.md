@@ -46,6 +46,26 @@ You can run `mix docs` to generate the documentation for this project.
 
 ### Getting started
 
+#### Docker compose
+
+Make sure docker is running on your machine.
+
+Start the API
+
+```bash
+$ docker-compose pull && docker-compose build && docker-compose up
+```
+
+API is now running on http://localhost:4000
+
+Remove database data
+
+```bash
+$ docker-compose down --volumes
+```
+
+#### Local runtime dependencies
+
 Get the dependencies
 
 ```bash
