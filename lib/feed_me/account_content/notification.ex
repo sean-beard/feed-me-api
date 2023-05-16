@@ -71,21 +71,7 @@ defmodule FeedMe.AccountContent.Notification do
   def get_new_unread_item_count_by_user(start_unread_item_counts, end_unread_item_counts) do
     end_unread_item_counts
     |> Enum.map(fn %{user_id: user_id, num_unread_items: end_count} ->
-      case Enum.find(start_unread_item_counts, fn row -> row.user_id == user_id end) do
-        nil ->
-          nil
-
-        start_count_row ->
-          start_count = start_count_row.num_unread_items
-
-          new_unread_item_count = end_count - start_count
-
-          if new_unread_item_count > 0 do
-            %{user_id: user_id, num_unread_items: new_unread_item_count}
-          else
-            nil
-          end
-      end
+      get_new_unread_item_count(user_id, end_count, start_unread_item_counts)
     end)
     |> Enum.filter(fn row -> row != nil end)
   end
@@ -127,23 +113,36 @@ defmodule FeedMe.AccountContent.Notification do
 
     IO.puts("Found #{Enum.count(subs)} notification subscriptions...")
 
-    subs
-    |> Enum.map(fn sub ->
+    for sub <- subs do
       valid_sub = get_valid_subscription(sub)
 
       body =
         ~s({"title": "New Feed Items", "body": "You have #{num_unread_items} new feed items!", "url": "#{sub.origin}/"})
 
       send(%{body: body, subscription: valid_sub})
-    end)
+    end
 
     IO.puts("Done sending notifications...")
   end
 
-  defp send(%{body: body, subscription: subscription}) do
-    # TODO: can we delete this?
-    gcm_api_key = nil
+  defp get_new_unread_item_count(user_id, end_count, start_unread_item_counts) do
+    case Enum.find(start_unread_item_counts, fn row -> row.user_id == user_id end) do
+      nil ->
+        nil
 
-    WebPushEncryption.send_web_push(body, subscription, gcm_api_key)
+      start_count_row ->
+        start_count = start_count_row.num_unread_items
+        new_unread_item_count = end_count - start_count
+
+        if new_unread_item_count > 0 do
+          %{user_id: user_id, num_unread_items: new_unread_item_count}
+        else
+          nil
+        end
+    end
+  end
+
+  defp send(%{body: body, subscription: subscription}) do
+    WebPushEncryption.send_web_push(body, subscription)
   end
 end
