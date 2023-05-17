@@ -69,11 +69,17 @@ defmodule FeedMe.AccountContent.Notification do
   end
 
   def get_new_unread_item_count_by_user(start_unread_item_counts, end_unread_item_counts) do
-    end_unread_item_counts
-    |> Enum.map(fn %{user_id: user_id, num_unread_items: end_count} ->
-      get_new_unread_item_count(user_id, end_count, start_unread_item_counts)
-    end)
-    |> Enum.filter(fn row -> row != nil end)
+    case Enum.count(start_unread_item_counts) do
+      0 ->
+        end_unread_item_counts
+
+      _ ->
+        end_unread_item_counts
+        |> Enum.map(fn %{user_id: user_id, num_unread_items: end_count} ->
+          get_new_unread_item_count(user_id, end_count, start_unread_item_counts)
+        end)
+        |> Enum.filter(fn row -> row != nil end)
+    end
   end
 
   # from client model to web push model

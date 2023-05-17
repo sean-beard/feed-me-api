@@ -235,7 +235,7 @@ defmodule FeedMe.AccountContent do
   end
 
   @doc """
-  Creates new feed item statuses given a user ID and a feed.
+  Creates new feed item statuses given a user ID and a feed if they are not in the DB.
 
   ## Examples
 
@@ -246,7 +246,7 @@ defmodule FeedMe.AccountContent do
     feed
     |> Repo.preload(:feed_items)
     |> Map.get(:feed_items, [])
-    |> get_statuses_from_items(user_id)
+    |> get_statuses_to_create(user_id)
     |> update_item_statuses
   end
 
@@ -315,27 +315,50 @@ defmodule FeedMe.AccountContent do
 
   ## Examples
 
-      iex> get_statuses_from_items(feed_items, user_id)
+      iex> get_statuses_to_create(feed_items, user_id)
       [%FeedItemStatus{}, ...]
 
   """
-  defp get_statuses_from_items(items, user_id) do
-    items
-    |> Enum.map(fn item ->
-      # Repo.insert_all doesn't support auto timestamps
-      utc_now =
-        NaiveDateTime.utc_now()
-        |> NaiveDateTime.truncate(:second)
+  defp get_statuses_to_create(items, user_id) do
+    item_ids = Enum.map(items, fn item -> item.id end)
 
-      %{
-        user_id: user_id,
-        feed_item_id: item.id,
-        is_read: false,
-        current_time_sec: nil,
-        inserted_at: utc_now,
-        updated_at: utc_now
-      }
-    end)
+    query = """
+      SELECT feed_item_id
+      FROM (
+        SELECT unnest(ARRAY#{Jason.encode!(item_ids)}) AS feed_item_id
+      ) AS new_feed_items
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM feed_item_statuses
+        WHERE user_id = #{user_id}
+          AND feed_item_id = new_feed_items.feed_item_id
+      );
+    """
+
+    case Repo.query(query) do
+      {:ok, result = %Postgrex.Result{}} ->
+        IO.puts("Found #{result.num_rows} new item statuses to create...")
+
+        # Repo.insert_all doesn't support auto timestamps
+        utc_now =
+          NaiveDateTime.utc_now()
+          |> NaiveDateTime.truncate(:second)
+
+        result.rows
+        |> Enum.map(fn [feed_item_id] ->
+          %{
+            user_id: user_id,
+            feed_item_id: feed_item_id,
+            is_read: false,
+            current_time_sec: nil,
+            inserted_at: utc_now,
+            updated_at: utc_now
+          }
+        end)
+
+      _error ->
+        []
+    end
   end
 
   @doc """
@@ -343,7 +366,7 @@ defmodule FeedMe.AccountContent do
 
   ## Examples
 
-      iex> get_statuses_from_items(client_feed_items, user_id)
+      iex> get_statuses_from_dtos(feed_item_dtos, user_id)
       [%FeedItemStatus{}, ...]
 
   """
