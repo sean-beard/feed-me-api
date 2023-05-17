@@ -38,6 +38,10 @@ if config_env() == :prod do
       transport_options: [socket_opts: [:inet6]]
     ],
     secret_key_base: secret_key_base
+
+  config :ueberauth, Ueberauth.Strategy.Github.OAuth,
+    client_id: System.get_env("GITHUB_CLIENT_ID"),
+    client_secret: System.get_env("GITHUB_CLIENT_SECRET")
 end
 
 # ## Using releases (Elixir v1.9+)
