@@ -37,11 +37,6 @@ config :feed_me, FeedMe.Scheduler,
     {"0 */2 * * *", {FeedMe.AccountContent.FeedItemStorage, :store, []}}
   ]
 
-config :web_push_encryption, :vapid_details,
-  subject: "https://github.com/sean-beard/feed-me-astro/",
-  public_key: System.get_env("VAPID_PUBLIC_KEY"),
-  private_key: System.get_env("VAPID_PRIVATE_KEY")
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
