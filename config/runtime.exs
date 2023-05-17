@@ -26,8 +26,10 @@ if config_env() == :prod do
       """
 
   config :feed_me, FeedMeWeb.Endpoint,
+    url: [scheme: "https", host: System.get_env("PHX_HOST"), port: 8080],
+    server: true,
     http: [
-      port: String.to_integer(System.get_env("PORT") || "4000"),
+      port: String.to_integer(System.get_env("PORT") || "8080"),
       transport_options: [socket_opts: [:inet6]]
     ],
     secret_key_base: secret_key_base
