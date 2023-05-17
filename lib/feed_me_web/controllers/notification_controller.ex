@@ -8,7 +8,7 @@ defmodule FeedMeWeb.NotificationController do
   plug(FeedMeWeb.Plugs.VerifyHeader, realm: "Bearer")
 
   def get_vapid_public_key(conn, _params) do
-    public_key = System.get_env("VAPID_PUBLIC_KEY")
+    public_key = Application.get_env(:web_push_encryption, :vapid_details)[:public_key]
 
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, key: public_key}))
   end

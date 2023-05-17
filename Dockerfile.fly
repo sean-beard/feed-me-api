@@ -58,9 +58,6 @@ RUN mix compile
 
 COPY rel rel
 
-COPY entrypoint.sh .
-CMD ["sh", "/app/entrypoint.sh"]
-
 RUN mix release
 
 # start a new build stage so that the final image will only contain
