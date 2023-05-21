@@ -93,6 +93,16 @@ defmodule FeedMe.AccountContent.Notification do
     %{endpoint: endpoint, keys: keys, expiration_time: expiration_time}
   end
 
+  # from client (safari) model to web push model
+  def get_valid_subscription(%{
+        "endpoint" => endpoint,
+        "keys" => %{"p256dh" => p256dh, "auth" => auth}
+      }) do
+    keys = %{p256dh: p256dh, auth: auth}
+
+    %{endpoint: endpoint, keys: keys, expiration_time: nil}
+  end
+
   # from DB model to web push model
   def get_valid_subscription(%NotificationSubscription{} = subscription) do
     keys = %{p256dh: subscription.p256dh, auth: subscription.auth}
