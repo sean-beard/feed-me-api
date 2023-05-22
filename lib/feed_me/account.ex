@@ -6,7 +6,22 @@ defmodule FeedMe.Account do
   import Ecto.Query, warn: false
   alias FeedMe.Repo
 
+  alias FeedMe.Account.AccountDto
   alias FeedMe.Account.User
+
+  def get_account(user_id) do
+    case get_user!(user_id) do
+      %User{} = user ->
+        account_dto = %AccountDto{
+          notificationEnabled: user.notification_enabled
+        }
+
+        {:ok, account_dto}
+
+      _not_found ->
+        :error
+    end
+  end
 
   @doc """
   Returns the list of users.

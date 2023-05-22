@@ -4,6 +4,8 @@ defmodule FeedMe.AccountContent.Notification do
   """
 
   import Ecto.Query, warn: false
+  alias FeedMe.Account
+  alias FeedMe.Account.AccountDto
   alias FeedMe.AccountContent.NotificationSubscription
   alias FeedMe.Repo
 
@@ -114,31 +116,72 @@ defmodule FeedMe.AccountContent.Notification do
     }
   end
 
-  def get_valid_subscription() do
-    raise "Cannot send a notification without a subscription."
-  end
-
   def get_valid_subscription(_anything) do
     raise "Subscription not formatted properly."
   end
 
+  def get_valid_subscription() do
+    raise "Cannot send a notification without a subscription."
+  end
+
   def send_notifications(%{user_id: user_id, num_unread_items: num_unread_items}) do
-    IO.puts("Starting job to send notifications to user #{user_id}...")
+    case Account.get_account(user_id) do
+      {:ok, %AccountDto{notificationEnabled: true}} ->
+        IO.puts("Starting job to send notifications to user #{user_id}...")
 
-    subs = list_notification_subscriptions(user_id)
+        subs = list_notification_subscriptions(user_id)
 
-    IO.puts("Found #{Enum.count(subs)} notification subscriptions...")
+        IO.puts("Found #{Enum.count(subs)} notification subscriptions...")
 
-    for sub <- subs do
-      valid_sub = get_valid_subscription(sub)
+        for sub <- subs do
+          valid_sub = get_valid_subscription(sub)
 
-      body =
-        ~s({"title": "New Feed Items", "body": "You have #{num_unread_items} new feed items!", "url": "#{sub.origin}/"})
+          body =
+            ~s({"title": "New Feed Items", "body": "You have #{num_unread_items} new feed items!", "url": "#{sub.origin}/"})
 
-      send(%{body: body, subscription: valid_sub})
+          send(%{body: body, subscription: valid_sub})
+        end
+
+        IO.puts("Done sending notifications...")
+
+      _anything ->
+        IO.puts("Notifications are not enabled for user with ID #{user_id}...")
     end
+  end
 
-    IO.puts("Done sending notifications...")
+  @doc """
+  Updates notification preference for a user.
+
+  ## Examples
+
+      iex> update_notification_preference(user_id, preference)
+      :ok
+
+      iex> update_notification_preference(user_id, preference)
+      :error
+  """
+  def update_notification_preference(user_id, preference) do
+    notification_enabled = preference === "enabled"
+
+    query = """
+      UPDATE users
+      SET notification_enabled = #{notification_enabled}
+      WHERE id = #{user_id};
+    """
+
+    case Repo.query(query) do
+      {:ok, %Postgrex.Result{}} ->
+        IO.puts("Successfully updated notification preference...")
+
+        :ok
+
+      _error ->
+        IO.puts(
+          "Error updating notification preference for user #{user_id} with preference: #{preference}"
+        )
+
+        :error
+    end
   end
 
   defp get_new_unread_item_count(user_id, end_count, start_unread_item_counts) do
