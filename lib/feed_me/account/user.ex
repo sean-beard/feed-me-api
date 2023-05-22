@@ -11,6 +11,7 @@ defmodule FeedMe.Account.User do
     field :name, :string
     field :provider, :string
     field :token, :string
+    field :notification_enabled, :boolean
     has_many :subscriptions, FeedMe.AccountContent.Subscription
     has_many :feed_item_statuses, FeedMe.AccountContent.FeedItemStatus
 
@@ -20,7 +21,7 @@ defmodule FeedMe.Account.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :provider, :token])
+    |> cast(attrs, [:name, :email, :provider, :token, :notification_enabled])
     |> validate_required([:name, :email, :provider, :token])
   end
 end

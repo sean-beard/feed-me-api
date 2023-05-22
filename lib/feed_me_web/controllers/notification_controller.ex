@@ -41,4 +41,20 @@ defmodule FeedMeWeb.NotificationController do
         )
     end
   end
+
+  def update_notification_preference(conn, %{"preference" => preference}) do
+    user_id = conn.assigns.user.id
+
+    case Notification.update_notification_preference(user_id, preference) do
+      :ok ->
+        Conn.send_resp(conn, :ok, Jason.encode!(%{status: 201}))
+
+      :error ->
+        Conn.send_resp(
+          conn,
+          :internal_server_error,
+          Jason.encode!(%{status: 500, message: "Error updating notification preference"})
+        )
+    end
+  end
 end

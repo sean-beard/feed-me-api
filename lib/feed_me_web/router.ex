@@ -33,6 +33,9 @@ defmodule FeedMeWeb.Router do
     delete "/subscription", SubscriptionController, :unsubscribe
     options "/subscription", SubscriptionController, :nothing
 
+    get "/account", AccountController, :get_account
+    options "/account", AccountController, :nothing
+
     get "/feed", FeedController, :index
     options "/feed", FeedController, :nothing
 
@@ -46,6 +49,7 @@ defmodule FeedMeWeb.Router do
     options "/vapid-public-key", NotificationController, :nothing
 
     post "/notification", NotificationController, :save_notification_subscription
+    put "/notification", NotificationController, :update_notification_preference
     options "/notification", NotificationController, :nothing
   end
 
