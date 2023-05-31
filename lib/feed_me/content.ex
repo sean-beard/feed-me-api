@@ -25,10 +25,17 @@ defmodule FeedMe.Content do
 
   """
   def list_feed(user_id) do
+    unread_feed = list_unread_feed(user_id)
+    read_feed = list_read_feed(user_id)
+
+    Enum.concat(unread_feed, read_feed)
+  end
+
+  def search_feed(user_id, search_term) do
     query = """
-      select
+      SELECT
         i.id,
-        f.name as feed_name,
+        f.name AS feed_name,
         i.title,
         i.description,
         i.url,
@@ -36,25 +43,115 @@ defmodule FeedMe.Content do
         s.current_time_sec,
         i.media_type,
         i.media_url,
-        case
-          when i.pub_date like '___, % ___ %' then to_date(i.pub_date, 'DY, DD Mon YYYY')
-          when i.pub_date like '%-%-%' then to_date(i.pub_date, 'YYYY-MM-DD')
-        end as pub_date
-      from feed_items as i
-      inner join feeds as f
-        on i.feed_id = f.id
-      left join feed_item_statuses as s
-        on s.user_id = #{user_id} and s.feed_item_id = i.id
-      where i.feed_id in (
-        select s.feed_id from subscriptions as s
-        where user_id = #{user_id} and is_subscribed = true
-      )
-      order by pub_date desc, s.is_read asc
+        CASE
+          WHEN i.pub_date LIKE '___, % ___ %' THEN to_timestamp(i.pub_date, 'Dy, DD Mon YYYY HH24:MI:SS')
+          WHEN i.pub_date LIKE '%-%-%' THEN to_timestamp(i.pub_date, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS pub_date
+      FROM
+        feed_items AS i
+        INNER JOIN feeds AS f ON i.feed_id = f.id
+        LEFT JOIN feed_item_statuses AS s ON s.user_id = #{user_id} AND s.feed_item_id = i.id
+      WHERE
+        i.feed_id IN (
+          SELECT s.feed_id FROM subscriptions AS s WHERE user_id = #{user_id} AND is_subscribed = TRUE
+        )
+        AND (
+          i.title ILIKE '%' || '#{search_term}' || '%' OR
+          f.name ILIKE '%' || '#{search_term}' || '%' OR
+          encode(i.description, 'hex') ILIKE '%' || encode('#{search_term}', 'hex') || '%'
+        )
+      ORDER BY
+        s.is_read ASC, pub_date DESC;
     """
 
     case Repo.query(query) do
       {:ok, result = %Postgrex.Result{}} ->
-        IO.puts("Found #{result.num_rows} feed items...")
+        IO.puts("Found #{result.num_rows} search results...")
+        process_db_feed_result(result)
+
+      _error ->
+        []
+    end
+  end
+
+  defp list_unread_feed(user_id) do
+    query = """
+      SELECT
+        i.id,
+        f.name AS feed_name,
+        i.title,
+        i.description,
+        i.url,
+        s.is_read,
+        s.current_time_sec,
+        i.media_type,
+        i.media_url,
+        CASE WHEN i.pub_date LIKE '___, % ___ %' THEN
+          to_timestamp(i.pub_date, 'Dy, DD Mon YYYY HH24:MI:SS')
+        WHEN i.pub_date LIKE '%-%-%' THEN
+          to_timestamp(i.pub_date, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS pub_date
+      FROM feed_items AS i
+      INNER JOIN feeds AS f ON i.feed_id = f.id
+      LEFT JOIN feed_item_statuses AS s ON s.user_id = #{user_id}
+        AND s.feed_item_id = i.id
+      WHERE
+        i.feed_id in(
+          SELECT
+            s.feed_id FROM subscriptions AS s
+          WHERE
+            user_id = #{user_id}
+            AND is_subscribed = TRUE)
+        AND s.is_read IS FALSE
+      ORDER BY pub_date DESC
+    """
+
+    case Repo.query(query) do
+      {:ok, result = %Postgrex.Result{}} ->
+        IO.puts("Found #{result.num_rows} unread feed items...")
+        process_db_feed_result(result)
+
+      _error ->
+        []
+    end
+  end
+
+  defp list_read_feed(user_id) do
+    query = """
+      SELECT
+        i.id,
+        f.name AS feed_name,
+        i.title,
+        i.description,
+        i.url,
+        s.is_read,
+        s.current_time_sec,
+        i.media_type,
+        i.media_url,
+        CASE WHEN i.pub_date LIKE '___, % ___ %' THEN
+          to_timestamp(i.pub_date, 'Dy, DD Mon YYYY HH24:MI:SS')
+        WHEN i.pub_date LIKE '%-%-%' THEN
+          to_timestamp(i.pub_date, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS pub_date
+      FROM feed_items AS i
+      INNER JOIN feeds AS f ON i.feed_id = f.id
+      LEFT JOIN feed_item_statuses AS s ON s.user_id = #{user_id}
+        AND s.feed_item_id = i.id
+      WHERE
+        i.feed_id in(
+          SELECT
+            s.feed_id FROM subscriptions AS s
+          WHERE
+            user_id = #{user_id}
+            AND is_subscribed = TRUE)
+        AND s.is_read IS TRUE
+      ORDER BY pub_date DESC
+      LIMIT 100
+    """
+
+    case Repo.query(query) do
+      {:ok, result = %Postgrex.Result{}} ->
+        IO.puts("Found #{result.num_rows} read feed items...")
         process_db_feed_result(result)
 
       _error ->

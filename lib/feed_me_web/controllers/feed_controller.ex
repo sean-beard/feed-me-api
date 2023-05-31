@@ -13,6 +13,12 @@ defmodule FeedMeWeb.FeedController do
     Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feed: feed}))
   end
 
+  def search(conn, %{"term" => search_term}) do
+    results = Content.search_feed(conn.assigns.user.id, search_term)
+
+    Conn.send_resp(conn, :ok, Jason.encode!(%{status: 200, feed: results}))
+  end
+
   def get_item(conn, %{"id" => feed_item_id}) do
     user = conn.assigns.user
 

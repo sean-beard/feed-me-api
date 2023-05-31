@@ -37,6 +37,7 @@ defmodule FeedMeWeb.Router do
     options "/account", AccountController, :nothing
 
     get "/feed", FeedController, :index
+    post "/feed", FeedController, :search
     options "/feed", FeedController, :nothing
 
     put "/item", FeedController, :update_item_statuses
