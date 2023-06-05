@@ -136,8 +136,10 @@ defmodule FeedMe.AccountContent.Notification do
         for sub <- subs do
           valid_sub = get_valid_subscription(sub)
 
+          body_message = get_body_message(num_unread_items)
+
           body =
-            ~s({"title": "New Feed Items", "body": "You have #{num_unread_items} new feed items!", "url": "#{sub.origin}/"})
+            ~s({"title": "New Feed Items", "body": "#{body_message}", "url": "#{sub.origin}/"})
 
           send(%{body: body, subscription: valid_sub})
         end
@@ -203,5 +205,18 @@ defmodule FeedMe.AccountContent.Notification do
 
   defp send(%{body: body, subscription: subscription}) do
     WebPushEncryption.send_web_push(body, subscription)
+  end
+
+  defp get_body_message(num_unread_items) do
+    case num_unread_items do
+      0 ->
+        "You have no new feed items."
+
+      1 ->
+        "You have 1 new feed item!"
+
+      _ ->
+        "You have #{num_unread_items} new feed items!"
+    end
   end
 end
