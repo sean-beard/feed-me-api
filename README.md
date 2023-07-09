@@ -10,35 +10,22 @@ Aditionally, available feed items will be stored. There is a job scheduled every
 
 ## Endpoints
 
-| Endpoint                |  Verb  |                               Description |
-| :---------------------- | :----: | ----------------------------------------: |
-| `/feed`                 |  GET   |                      Get the user's feed. |
-| `/item/:id`             |  GET   |                    Get a feed item by ID. |
-| `/item`                 |  PUT   |                     Upsert item statuses. |
-| `/subscription`         |  GET   |        Get the user's feed subscriptions. |
-| `/subscription`         |  POST  |                      Subscribe to a feed. |
-| `/subscription`         | DELETE |                  Unsubscribe from a feed. |
-| `/auth/logout`          |  GET   |                          Logout the user. |
-| `/auth/github`          |  GET   |                      Request GitHub auth. |
-| `/auth/github/callback` |  GET   | Login to the application via GitHub auth. |
+| Endpoint                |  Verb  |                                      Description |
+| :---------------------- | :----: | -----------------------------------------------: |
+| `/feed`                 |  GET   |                             Get the user's feed. |
+| `/item/:id`             |  GET   |                           Get a feed item by ID. |
+| `/item`                 |  PUT   |                            Upsert item statuses. |
+| `/subscription`         |  GET   |               Get the user's feed subscriptions. |
+| `/subscription`         |  POST  |                             Subscribe to a feed. |
+| `/subscription`         | DELETE |                         Unsubscribe from a feed. |
+| `/auth/logout`          |  GET   |                                 Logout the user. |
+| `/auth/github`          |  GET   |                             Request GitHub auth. |
+| `/auth/github/callback` |  GET   |        Login to the application via GitHub auth. |
+| `/vapid-public-key`     |  GET   | Get the VAPID public key used for notifications. |
+| `/notification`         |  POST  |            Store a new notifiction subscription. |
+| `/notification`         |  PUT   |       Toggle notification preference for a user. |
 
 ## Development
-
-If you're using VSCode you can use the development container to contribute without installing any runtime dependencies on your machine. To do so, install the [VSCode Remote Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
-
-To open the dev container:
-
-⌘ + ⇧ + P -> "Remote-Containers: Rebuild and Reopen in Container"
-
-To close the dev container:
-
-⌘ + ⇧ + P -> "Remote-Containers: Reopen Locally"
-
-Otherwise, make sure to have Elixir, Erlang and Postgres installed on your machine. This application was developed with:
-
-- Elixir v1.14.4
-- Erlang v25.3.2
-- Postgres v13 (needs to be v9.5 or higher)
 
 You can run `mix docs` to generate the documentation for this project.
 
@@ -65,6 +52,12 @@ $ docker-compose down --volumes
 ```
 
 #### Local runtime dependencies
+
+Make sure to have Elixir, Erlang and Postgres installed on your machine. This application was developed with:
+
+- Elixir v1.14.4
+- Erlang v25.3.2
+- Postgres v13 (needs to be v9.5 or higher)
 
 Get the dependencies
 
