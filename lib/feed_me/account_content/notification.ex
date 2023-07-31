@@ -41,7 +41,7 @@ defmodule FeedMe.AccountContent.Notification do
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:user, user)
     |> NotificationSubscription.changeset(attrs)
-    |> Repo.insert()
+    |> Repo.insert(on_conflict: :nothing, conflict_target: :endpoint)
   end
 
   def get_unread_item_count_by_user() do
